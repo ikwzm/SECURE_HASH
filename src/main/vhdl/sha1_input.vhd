@@ -2,8 +2,8 @@
 --!     @file    sha1_input.vhd
 --!     @brief   SHA1 INPUT MODULE :
 --!              SHA1用入力モジュール.
---!     @version 0.0.1
---!     @date    2012/9/21
+--!     @version 0.0.2
+--!     @date    2012/9/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -40,6 +40,7 @@ use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
 --! @brief   SHA1_INPUT :
 --!          SHA1用入力モジュール.
+--!          ブロック単位でのパディング、入力ビット数の付加等の処理を行う.
 -----------------------------------------------------------------------------------
 entity  SHA1_INPUT is
     generic (
@@ -147,14 +148,14 @@ architecture RTL of SHA1_INPUT is
     -------------------------------------------------------------------------------
     signal    symbol_size     : std_logic_vector(63 downto 0);
     -------------------------------------------------------------------------------
-    -- 
+    -- ステートマシンの型宣言.
     -------------------------------------------------------------------------------
     type      STATE_TYPE    is (  INPUT_STATE  ,
                                   PADDING_STATE,
                                   LAST_STATE
                                );
     -------------------------------------------------------------------------------
-    -- 
+    -- 各種内部状態信号.
     -------------------------------------------------------------------------------
     signal    curr_state      : STATE_TYPE;
     signal    next_state      : STATE_TYPE;
@@ -207,7 +208,7 @@ begin
         in_symbol <= I_DATA;
     end generate;
     -------------------------------------------------------------------------------
-    -- 異なるデータ幅のパスを継ぐためのアダプタ
+    -- 入力バッファ.
     -------------------------------------------------------------------------------
     I_BUF: REDUCER 
         generic map (
@@ -282,7 +283,8 @@ begin
         if    (RST = '1') then
                 symbol_size <= (others => '0');
         elsif (CLK'event and CLK = '1') then
-            if    (out_valid = '1' and out_ready = '1' and out_done = '1') then
+            if    (CLR = '1') or
+                  (out_valid = '1' and out_ready = '1' and out_done = '1') then
                 symbol_size <= (others => '0');
             elsif (I_VAL = '1' and in_ready = '1' and curr_state = INPUT_STATE) then
                 in_size := COUNT_BIT_1(I_ENA) * SYMBOL_BITS;
@@ -474,7 +476,7 @@ begin
                     end if;
                 when LAST_STATE =>
                     out_data   := REVERSE_BIT(symbol_size) & 
-                                  (out_data'high-65 downto 1 => '0') & curr_delimiter;
+                                  (out_data'high-64 downto 1 => '0') & curr_delimiter;
                     out_done   <= '1';
                     out_valid  <= '1';
                     next_state <= INPUT_STATE;
@@ -516,7 +518,11 @@ begin
                 curr_delimiter  <= "0";
                 remain_out_size <= MAX_OUT_SIZE;
         elsif (CLK'event and CLK = '1') then
-            if (out_valid = '1' and out_ready = '1') then
+            if (CLR = '1') then
+                curr_state      <= INPUT_STATE;
+                curr_delimiter  <= "0";
+                remain_out_size <= MAX_OUT_SIZE;
+            elsif (out_valid = '1' and out_ready = '1') then
                 curr_state      <= next_state;
                 curr_delimiter  <= next_delimiter;
                 if (out_done = '1' or remain_out_size = 0) then

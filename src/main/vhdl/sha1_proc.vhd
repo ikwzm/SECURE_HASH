@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_stage2.vhd
---!     @brief   SHA1 STAGE2 MODULE :
---!              SHA1用ワードデータ生成モジュール.
---!     @version 0.0.1
---!     @date    2012/9/21
+--!     @brief   SHA1 STAGE2 Processing MODULE :
+--!              SHA1用計算モジュール.
+--!     @version 0.0.2
+--!     @date    2012/9/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

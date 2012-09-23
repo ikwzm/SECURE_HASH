@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_stage1.vhd
 --!     @brief   SHA1 STAGE1 MODULE :
---!              SHA1用ワードデータ生成モジュール.
---!     @version 0.0.1
---!     @date    2012/9/21
+--!              SHA1用ワードデータ(W[t])生成モジュール.
+--!     @version 0.0.2
+--!     @date    2012/9/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -39,7 +39,7 @@ library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
 --! @brief   SHA1_STAGE1 :
---!          SHA1用ワードデータ生成.
+--!          SHA1用ワードデータ(W[t])生成モジュール.
 -----------------------------------------------------------------------------------
 entity  SHA1_STAGE1 is
     generic (
@@ -88,21 +88,11 @@ end SHA1_STAGE1;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.Components.REDUCER;
 architecture RTL of SHA1_STAGE1 is
-    -------------------------------------------------------------------------------
-    -- １ブロックのビット数
-    -------------------------------------------------------------------------------
-    constant  BLOCK_BITS      : integer := 512;
     -------------------------------------------------------------------------------
     -- １ワードのビット数
     -------------------------------------------------------------------------------
     constant  WORD_BITS       : integer := 32;
-    -------------------------------------------------------------------------------
-    -- データのビット数
-    -------------------------------------------------------------------------------
-    constant  DATA_BITS       : integer := WORD_BITS*WORDS;
     -------------------------------------------------------------------------------
     -- W[t]の型定義.
     -------------------------------------------------------------------------------
@@ -115,7 +105,7 @@ architecture RTL of SHA1_STAGE1 is
     signal    word_regs       : WORD_VECTOR(0 to 15);
     signal    word_work       : WORD_VECTOR(0 to 15 + WORDS);
     -------------------------------------------------------------------------------
-    -- 
+    -- 各種内部信号.
     -------------------------------------------------------------------------------
     signal    state_count     : integer range 0 to 80/WORDS;
     signal    input_state     : boolean;
@@ -124,7 +114,7 @@ architecture RTL of SHA1_STAGE1 is
     signal    valid           : std_logic;
     signal    done            : std_logic;
     -------------------------------------------------------------------------------
-    -- 
+    -- ローテート演算関数.
     -------------------------------------------------------------------------------
     function  ROTATE(ARG:WORD_TYPE) return WORD_TYPE is
     begin
@@ -148,9 +138,11 @@ begin
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
-            word_regs <= (others => WORD_NULL);
+                word_regs <= (others => WORD_NULL);
         elsif (CLK'event and CLK = '1') then
-            if (valid = '1') then
+            if (CLR = '1') then
+                word_regs <= (others => WORD_NULL);
+            elsif (valid = '1') then
                 word_regs <= word_work(WORDS to WORDS+15);
             end if;
         end if;
@@ -169,9 +161,9 @@ begin
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
-            state_count <= 0;
+                state_count <= 0;
         elsif (CLK'event and CLK = '1') then
-            if    (last_state) then
+            if    (CLR = '1' or last_state) then
                 state_count <= 0;
             elsif (valid = '1') then
                 state_count <= state_count + 1;
@@ -186,21 +178,27 @@ begin
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
-            done   <= '0';
-            O_VAL  <= '0';
-            O_DONE <= '0';
-        elsif (CLK'event and CLK = '1') then
-            if    (input_state and I_VAL = '1' and I_DONE = '1') then
-                done <= '1';
-            elsif (last_state) then
-                done <= '0';
-            end if;
-            if (last_state and done = '1') then
-                O_DONE <= '1';
-            else
+                done   <= '0';
+                O_VAL  <= '0';
                 O_DONE <= '0';
+        elsif (CLK'event and CLK = '1') then
+            if (CLR = '1') then
+                done   <= '0';
+                O_VAL  <= '0';
+                O_DONE <= '0';
+            else
+                if    (input_state and I_VAL = '1' and I_DONE = '1') then
+                    done <= '1';
+                elsif (last_state) then
+                    done <= '0';
+                end if;
+                if (last_state and done = '1') then
+                    O_DONE <= '1';
+                else
+                    O_DONE <= '0';
+                end if;
+                O_VAL <= valid;
             end if;
-            O_VAL <= valid;
         end if;
     end process;
     -------------------------------------------------------------------------------

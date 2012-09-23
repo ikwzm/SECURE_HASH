@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_stage2.vhd
 --!     @brief   SHA1 STAGE2 MODULE :
---!              SHA1用ワードデータ生成モジュール.
---!     @version 0.0.1
---!     @date    2012/9/21
+--!              SHA1用計算モジュール.
+--!     @version 0.0.2
+--!     @date    2012/9/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -180,21 +180,35 @@ begin
         variable h4_next : std_logic_vector(31 downto 0);
     begin
         if (RST = '1') then
-            h0     <= H0_INIT;
-            h1     <= H1_INIT;
-            h2     <= H2_INIT;
-            h3     <= H3_INIT;
-            h4     <= H4_INIT;
-            a_reg  <= H0_INIT;
-            b_reg  <= H1_INIT;
-            c_reg  <= H2_INIT;
-            d_reg  <= H3_INIT;
-            e_reg  <= H4_INIT;
-            index  <= 0;
-            O_DATA <= (others => '0');
-            O_VAL  <= '0';
+                h0     <= H0_INIT;
+                h1     <= H1_INIT;
+                h2     <= H2_INIT;
+                h3     <= H3_INIT;
+                h4     <= H4_INIT;
+                a_reg  <= H0_INIT;
+                b_reg  <= H1_INIT;
+                c_reg  <= H2_INIT;
+                d_reg  <= H3_INIT;
+                e_reg  <= H4_INIT;
+                index  <= 0;
+                O_DATA <= (others => '0');
+                O_VAL  <= '0';
         elsif (CLK'event and CLK = '1') then
-            if (I_VAL = '1') then
+            if (CLR = '1') then
+                h0     <= H0_INIT;
+                h1     <= H1_INIT;
+                h2     <= H2_INIT;
+                h3     <= H3_INIT;
+                h4     <= H4_INIT;
+                a_reg  <= H0_INIT;
+                b_reg  <= H1_INIT;
+                c_reg  <= H2_INIT;
+                d_reg  <= H3_INIT;
+                e_reg  <= H4_INIT;
+                index  <= 0;
+                O_DATA <= (others => '0');
+                O_VAL  <= '0';
+            elsif (I_VAL = '1') then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a(a'high)));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b(b'high)));
                 h2_next := std_logic_vector(unsigned(h2) + unsigned(c(c'high)));

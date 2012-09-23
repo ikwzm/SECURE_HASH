@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    test_bench_1.vhd
 --!     @brief   SHA1 TEST BENCH No.1 :
---!     @version 0.0.1
+--!     @version 0.0.2
 --!     @date    2012/9/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ use     ieee.std_logic_1164.all;
 entity  TEST_BENCH_1 is
     generic (
         SYMBOLS     : integer := 4;
-        WORDS       : integer := 1;
+        WORDS       : integer := 4;
         VERBOSE     : integer := 0;
         AUTO_FINISH : integer := 1
     );
