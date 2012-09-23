@@ -58,6 +58,7 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.INTEGER_TO_STRING;
+use     DUMMY_PLUG.UTIL.HEX_TO_STRING;
 use     DUMMY_PLUG.UTIL.STRING_TO_STD_LOGIC_VECTOR;
 architecture MODEL of TEST_BENCH_1 is
     constant  SYMBOL_BITS   : integer := 8;
@@ -236,14 +237,20 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        assert(false) report MESSAGE_TAG & "Starting Test 1" severity NOTE;
+        SCENARIO <= "TEST1";
+        assert(VERBOSE=0) report MESSAGE_TAG & "Starting " & SCENARIO severity NOTE;
         INPUT_SYMBOL(STRING_TO_SYMBOL_VECTOR(TEST1), 0, TRUE);
-        STRING_TO_STD_LOGIC_VECTOR(STR     => string'("A9993E364706816ABA3E25717850C26C9CD0D89D"),
-                                   VAL     => exp_digest,
-                                   STR_LEN => str_len);
-        assert(false) report MESSAGE_TAG & "Wait Result Test 1" severity NOTE;
+        STRING_TO_STD_LOGIC_VECTOR(
+            STR     => string'("0xA9993E364706816ABA3E25717850C26C9CD0D89D"),
+            VAL     => exp_digest,
+            STR_LEN => str_len
+        );
+        assert(VERBOSE=0) report MESSAGE_TAG & "Wait " &  SCENARIO severity NOTE;
         wait until (CLK'event and CLK = '1' and O_VAL = '1');
-        assert (O_DATA = exp_digest) report MESSAGE_TAG & "Mismatch TEST1 " severity Error;
+        assert (O_DATA = exp_digest)
+            report MESSAGE_TAG & "Mismatch TEST1 " & 
+                   "O_DATA="    & HEX_TO_STRING(O_DATA) &
+                   ",EXP_DATA=" & HEX_TO_STRING(exp_digest) severity Error;
         ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
