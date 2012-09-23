@@ -112,7 +112,7 @@ architecture RTL of SHA1_STAGE2 is
     constant  H0_INIT   : WORD_TYPE := "01100111010001010010001100000001"; -- 0x67452301
     constant  H1_INIT   : WORD_TYPE := "11101111110011011010101110001001"; -- 0xEFCDAB89
     constant  H2_INIT   : WORD_TYPE := "10011000101110101101110011111110"; -- 0x98BADCFE
-    constant  H3_INIT   : WORD_TYPE := "00010000001100100101010001110110"; -- 0x10324576
+    constant  H3_INIT   : WORD_TYPE := "00010000001100100101010001110110"; -- 0x10325476
     constant  H4_INIT   : WORD_TYPE := "11000011110100101110000111110000"; -- 0xC3D2E1F0
     -------------------------------------------------------------------------------
     -- 
@@ -184,12 +184,12 @@ begin
             O_DATA <= (others => '0');
             O_VAL  <= '0';
         elsif (CLK'event and CLK = '1') then
-            h0_next := std_logic_vector(unsigned(h0) + unsigned(a(a'high)));
-            h1_next := std_logic_vector(unsigned(h1) + unsigned(b(b'high)));
-            h2_next := std_logic_vector(unsigned(h2) + unsigned(c(c'high)));
-            h3_next := std_logic_vector(unsigned(h3) + unsigned(d(d'high)));
-            h4_next := std_logic_vector(unsigned(h4) + unsigned(e(e'high)));
             if (I_VAL = '1') then
+                h0_next := std_logic_vector(unsigned(h0) + unsigned(a(a'high)));
+                h1_next := std_logic_vector(unsigned(h1) + unsigned(b(b'high)));
+                h2_next := std_logic_vector(unsigned(h2) + unsigned(c(c'high)));
+                h3_next := std_logic_vector(unsigned(h3) + unsigned(d(d'high)));
+                h4_next := std_logic_vector(unsigned(h4) + unsigned(e(e'high)));
                 if (I_DONE = '1') then
                     h0     <= H0_INIT;
                     h1     <= H1_INIT;

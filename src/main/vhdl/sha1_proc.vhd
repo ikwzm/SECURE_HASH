@@ -96,7 +96,7 @@ begin
     a0 <= unsigned(Ai(Ai'high-5 downto Ai'low) & Ai(Ai'high downto Ai'high-5+1));
     a1 <= Func00_19(Bi,Ci,Di) when ( 0 <= T+NUM and T+NUM <= 19) else
           Func20_39(Bi,Ci,Di) when (20 <= T+NUM and T+NUM <= 39) else
-          Func40_59(Bi,Ci,Di) when (49 <= T+NUM and T+NUM <= 59) else
+          Func40_59(Bi,Ci,Di) when (40 <= T+NUM and T+NUM <= 59) else
           Func60_79(Bi,Ci,Di);
     a2 <= unsigned(Ei);
     a3 <= unsigned(W);
@@ -106,7 +106,7 @@ begin
           k3;
     Ao <= std_logic_vector(a0+a1+a2+a3+a4);
     Bo <= Ai;
-    Co <= Ci(Ci'high-30 downto Ci'low) & Ci(Ci'high downto Ci'high-30+1);
+    Co <= Bi(Bi'high-30 downto Bi'low) & Bi(Bi'high downto Bi'high-30+1);
     Do <= Ci;
     Eo <= Di;
 end RTL;
