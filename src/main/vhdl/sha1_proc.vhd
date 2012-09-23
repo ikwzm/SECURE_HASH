@@ -78,7 +78,7 @@ architecture RTL of SHA1_PROC is
     constant k3 : unsigned(31 downto 0) := "11001010011000101100000111010110"; -- 0xCA62C1D6
     function Func00_19(B,C,D:std_logic_vector) return unsigned is
     begin
-        return unsigned((B and C) or (not B and D));
+        return unsigned((B and C) or ((not B) and D));
     end function;
     function Func20_39(B,C,D:std_logic_vector) return unsigned is
     begin

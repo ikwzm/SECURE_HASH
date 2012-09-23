@@ -104,6 +104,11 @@ architecture RTL of SHA1_STAGE2 is
     signal    c         : WORD_VECTOR(0 to WORDS);
     signal    d         : WORD_VECTOR(0 to WORDS);
     signal    e         : WORD_VECTOR(0 to WORDS);
+    signal    a_reg     : WORD_TYPE;
+    signal    b_reg     : WORD_TYPE;
+    signal    c_reg     : WORD_TYPE;
+    signal    d_reg     : WORD_TYPE;
+    signal    e_reg     : WORD_TYPE;
     signal    h0        : WORD_TYPE;
     signal    h1        : WORD_TYPE;
     signal    h2        : WORD_TYPE;
@@ -140,11 +145,11 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    a(0) <= h0;
-    b(0) <= h1;
-    c(0) <= h2;
-    d(0) <= h3;
-    e(0) <= h4;
+    a(0) <= a_reg;
+    b(0) <= b_reg;
+    c(0) <= c_reg;
+    d(0) <= d_reg;
+    e(0) <= e_reg;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -180,6 +185,11 @@ begin
             h2     <= H2_INIT;
             h3     <= H3_INIT;
             h4     <= H4_INIT;
+            a_reg  <= H0_INIT;
+            b_reg  <= H1_INIT;
+            c_reg  <= H2_INIT;
+            d_reg  <= H3_INIT;
+            e_reg  <= H4_INIT;
             index  <= 0;
             O_DATA <= (others => '0');
             O_VAL  <= '0';
@@ -196,20 +206,35 @@ begin
                     h2     <= H2_INIT;
                     h3     <= H3_INIT;
                     h4     <= H4_INIT;
+                    a_reg  <= H0_INIT;
+                    b_reg  <= H1_INIT;
+                    c_reg  <= H2_INIT;
+                    d_reg  <= H3_INIT;
+                    e_reg  <= H4_INIT;
                     O_DATA <= h0_next & h1_next & h2_next & h3_next & h4_next;
                     O_VAL  <= '1';
                     index  <= 0;
                 else
-                    h0     <= h0_next;
-                    h1     <= h1_next;
-                    h2     <= h2_next;
-                    h3     <= h3_next;
-                    h4     <= h4_next;
                     O_VAL  <= '0';
                     if (index < 80-WORDS) then
                         index <= index + WORDS;
+                        a_reg <= a(a'high);
+                        b_reg <= b(b'high);
+                        c_reg <= c(c'high);
+                        d_reg <= d(d'high);
+                        e_reg <= e(e'high);
                     else
                         index <= 0;
+                        a_reg <= h0_next;
+                        b_reg <= h1_next;
+                        c_reg <= h2_next;
+                        d_reg <= h3_next;
+                        e_reg <= h4_next;
+                        h0    <= h0_next;
+                        h1    <= h1_next;
+                        h2    <= h2_next;
+                        h3    <= h3_next;
+                        h4    <= h4_next;
                     end if;
                 end if;
             else
