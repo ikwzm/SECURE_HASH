@@ -137,7 +137,7 @@ begin
     -------------------------------------------------------------------------------
     word_work(0 to 15) <= word_regs(0 to 15);
     WGEN: for i in 0 to WORDS-1 generate
-        word_work(16+i) <= I_DATA(32*(i+1)-1 downto 32*i) when (input_state) else
+        word_work(16+i) <= I_DATA(WORD_BITS*(i+1)-1 downto WORD_BITS*i) when (input_state) else
                            ROTATE(word_work(16+i-3 ) xor
                                   word_work(16+i-8 ) xor
                                   word_work(16+i-14) xor

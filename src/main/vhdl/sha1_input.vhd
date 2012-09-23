@@ -218,7 +218,7 @@ begin
             QUEUE_SIZE  => 0                    , -- キューのサイズはI_BUFにおまかせ.
             VALID_MIN   => ibuf_word_valid'low  , -- ibuf_word_validの範囲の最小値.
             VALID_MAX   => ibuf_word_valid'high , -- ibuf_word_validの範囲の最大値.
-            I_JUSTIFIED => 1                    , -- 入力シンボルはLSB側に詰められている.
+            I_JUSTIFIED => 0                    , -- 入力シンボルはLSB側に詰められているわけではない.
             FLUSH_ENABLE=> 0                      -- FLUSHは未使用にする.
         )
         port map (
@@ -261,7 +261,23 @@ begin
     -- 入力したシンボルの総ビット数をカウントするカウンタ.
     -------------------------------------------------------------------------------
     process (CLK, RST)
-        variable in_size : integer range 0 to SYMBOLS*SYMBOL_BITS;
+        subtype  SYMBOL_SIZE_TYPE  is integer range 0 to SYMBOLS*SYMBOL_BITS;
+        subtype  SYMBOL_COUNT_TYPE is integer range 0 to SYMBOLS;
+        function COUNT_BIT_1(ARG:std_logic_vector) return SYMBOL_COUNT_TYPE is
+            alias    ENA : std_logic_vector(ARG'length-1 downto 0) is ARG;
+        begin
+            if    (ENA'length = 1) then
+                if (ENA(0) = '1') then
+                    return 1;
+                else
+                    return 0;
+                end if;
+            else
+                return COUNT_BIT_1(ENA(ENA'high         downto (ENA'high+1)/2))
+                     + COUNT_BIT_1(ENA((ENA'high+1)/2-1 downto ENA'low       ));
+            end if;
+        end function;
+        variable in_size : SYMBOL_SIZE_TYPE;
     begin
         if    (RST = '1') then
                 symbol_size <= (others => '0');
@@ -269,13 +285,7 @@ begin
             if    (out_valid = '1' and out_ready = '1' and out_done = '1') then
                 symbol_size <= (others => '0');
             elsif (I_VAL = '1' and in_ready = '1' and curr_state = INPUT_STATE) then
-                in_size := 0;
-                for i in I_ENA'high downto I_ENA'low loop
-                    if (I_ENA(i) = '1') then
-                        in_size := i*SYMBOL_BITS;
-                        exit;
-                    end if;
-                end loop;
+                in_size := COUNT_BIT_1(I_ENA) * SYMBOL_BITS;
                 symbol_size <= std_logic_vector(unsigned(symbol_size) + in_size);
             end if;
         end if;
