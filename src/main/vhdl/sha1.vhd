@@ -110,14 +110,15 @@ architecture RTL of SHA1 is
     signal    word_done : std_logic;
     signal    word_valid: std_logic;
     -------------------------------------------------------------------------------
-    -- SHA1_INPUTのコンポーネント宣言
+    -- SHA_PRE_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
-    component SHA1_INPUT
+    component SHA_PRE_PROC
         generic (
+            WORD_BITS   : integer := 32;
+            WORDS       : integer := 1;
             SYMBOL_BITS : integer := 8;
             SYMBOLS     : integer := 4;
-            REVERSE     : integer := 1;
-            WORDS       : integer := 1
+            REVERSE     : integer := 1
         );
         port (
             CLK         : in  std_logic; 
@@ -129,7 +130,7 @@ architecture RTL of SHA1 is
             I_LAST      : in  std_logic;
             I_VAL       : in  std_logic;
             I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(32*WORDS-1 downto 0);
+            O_DATA      : out std_logic_vector(WORD_BITS*WORDS-1 downto 0);
             O_DONE      : out std_logic;
             O_VAL       : out std_logic;
             O_RDY       : in  std_logic
@@ -177,12 +178,13 @@ begin
     -------------------------------------------------------------------------------
     -- 入力処理(パディング、入力ビット数の付加).
     -------------------------------------------------------------------------------
-    INPUT: SHA1_INPUT 
+    PRE_PROC: SHA_PRE_PROC 
         generic map(
+            WORD_BITS   => 32,
+            WORDS       => WORDS,
             SYMBOL_BITS => SYMBOL_BITS,
             SYMBOLS     => SYMBOLS,
-            REVERSE     => REVERSE,
-            WORDS       => WORDS
+            REVERSE     => REVERSE
         )
         port map (
             CLK         => CLK         , -- In  :

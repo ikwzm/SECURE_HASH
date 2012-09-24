@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
---!     @file    sha1_input.vhd
---!     @brief   SHA1 INPUT MODULE :
---!              SHA1用入力モジュール.
+--!     @file    sha_pre_proc.vhd
+--!     @brief   SHA1/2 PRE-PROCESSING MODULE :
+--!              SHA1/2用プリプロセッシングモジュール.
 --!     @version 0.0.2
 --!     @date    2012/9/23
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
@@ -38,12 +38,20 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA1_INPUT :
+--! @brief   SHA_PRE_PROC :
 --!          SHA1用入力モジュール.
 --!          ブロック単位でのパディング、入力ビット数の付加等の処理を行う.
 -----------------------------------------------------------------------------------
-entity  SHA1_INPUT is
+entity  SHA_PRE_PROC is
     generic (
+        WORD_BITS   : --! @brief SHA-1/2 WORD BITS :
+                      --! １ワードのビット数を指定する.
+                      --! * SHA-1/SHA-256の場合は32を設定する.
+                      --! * SHA-512の場合は64を設定する.
+                      integer := 32;
+        WORDS       : --! @brief SHA-1/2 WORD SIZE :
+                      --! １クロックで処理するワード数を指定する.
+                      integer := 1;
         SYMBOL_BITS : --! @brief INPUT SYMBOL BITS :
                       --! 入力データの１シンボルのビット数を指定する.
                       integer := 8;
@@ -52,9 +60,6 @@ entity  SHA1_INPUT is
                       integer := 4;
         REVERSE     : --! @brief INPUT SYMBOL REVERSE :
                       --! 入力データのシンボルのビット並びを逆にするかどうかを指定する.
-                      integer := 1;
-        WORDS       : --! @brief OUTPUT WORD SIZE :
-                      --! 出力側のワード数を指定する(1ワードは32bit).
                       integer := 1
     );
     port (
@@ -89,7 +94,7 @@ entity  SHA1_INPUT is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(32*WORDS-1 downto 0);
+                      out std_logic_vector(WORD_BITS*WORDS-1 downto 0);
         O_DONE      : --! @brief OUTPUT WORD DONE :
                       out std_logic;
         O_VAL       : --! @brief OUTPUT WORD VALID :
@@ -97,7 +102,7 @@ entity  SHA1_INPUT is
         O_RDY       : --! @brief OUTPUT WORD READY :
                       in  std_logic
     );
-end SHA1_INPUT;
+end SHA_PRE_PROC;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
@@ -106,21 +111,17 @@ use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PipeWork;
 use     PipeWork.Components.REDUCER;
-architecture RTL of SHA1_INPUT is
+architecture RTL of SHA_PRE_PROC is
     -------------------------------------------------------------------------------
     -- １ブロックのビット数
     -------------------------------------------------------------------------------
-    constant  BLOCK_BITS      : integer := 512;
+    constant  BLOCK_BITS      : integer := 16*WORD_BITS;
     -------------------------------------------------------------------------------
-    -- １ワードのビット数
-    -------------------------------------------------------------------------------
-    constant  WORD_BITS       : integer := 32;
-    -------------------------------------------------------------------------------
-    -- 出力側データのビット数
+    -- 出力側ワードデータのビット数
     -------------------------------------------------------------------------------
     constant  OUT_BITS        : integer := WORD_BITS*WORDS;
     -------------------------------------------------------------------------------
-    -- 出力側データのシンボルの数(出力側データのビット数をシンボルのビット数で割った値)
+    -- 出力側ワードデータのシンボルの数(出力側データの総ビット数をシンボルのビット数で割った値)
     -------------------------------------------------------------------------------
     constant  OUT_SYMBOLS     : integer := OUT_BITS/SYMBOL_BITS;
     -------------------------------------------------------------------------------
@@ -146,7 +147,7 @@ architecture RTL of SHA1_INPUT is
     -------------------------------------------------------------------------------
     -- 入力したシンボルの総ビット数をカウントするカウンタ.
     -------------------------------------------------------------------------------
-    signal    symbol_size     : std_logic_vector(63 downto 0);
+    signal    symbol_size     : std_logic_vector(2*WORD_BITS-1 downto 0);
     -------------------------------------------------------------------------------
     -- ステートマシンの型宣言.
     -------------------------------------------------------------------------------
@@ -444,7 +445,7 @@ begin
                     if (ibuf_done = '1') then
                         if    (remain_out_size = 0 and out_sym_size) then
                             out_data   := REVERSE_BIT(symbol_size) & 
-                                          in_data(out_data'high-65 downto 0);
+                                          in_data(out_data'high-symbol_size'length downto 0);
                             out_done   <= '1';
                             out_valid  <= ibuf_valid;
                             next_state <= INPUT_STATE;
@@ -476,7 +477,7 @@ begin
                     end if;
                 when LAST_STATE =>
                     out_data   := REVERSE_BIT(symbol_size) & 
-                                  (out_data'high-64 downto 1 => '0') & curr_delimiter;
+                                  (out_data'high-symbol_size'length downto 1 => '0') & curr_delimiter;
                     out_done   <= '1';
                     out_valid  <= '1';
                     next_state <= INPUT_STATE;
