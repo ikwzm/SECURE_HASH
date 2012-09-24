@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1.vhd
---!     @brief   SHA1 MODULE :
---!     @version 0.0.2
---!     @date    2012/9/23
+--!     @brief   SHA-1 MODULE :
+--!     @version 0.1.0
+--!     @date    2012/9/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,8 +37,7 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA1_STAGE2 :
---!          SHA1の計算.
+--! @brief   SHA-1 計算モジュール.
 -----------------------------------------------------------------------------------
 entity  SHA1 is
     generic (
@@ -106,9 +105,6 @@ architecture RTL of SHA1 is
     signal    in_done   : std_logic;
     signal    in_valid  : std_logic;
     signal    in_ready  : std_logic;
-    signal    word_data : std_logic_vector(32*WORDS-1 downto 0);
-    signal    word_done : std_logic;
-    signal    word_valid: std_logic;
     -------------------------------------------------------------------------------
     -- SHA_PRE_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
@@ -137,9 +133,9 @@ architecture RTL of SHA1 is
         );
     end component;
     -------------------------------------------------------------------------------
-    -- SHA1_STAGE1のコンポーネント宣言
+    -- SHA1_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
-    component SHA1_STAGE1
+    component SHA1_PROC
         generic (
             WORDS       : integer := 1
         );
@@ -151,25 +147,6 @@ architecture RTL of SHA1 is
             I_DONE      : in  std_logic;
             I_VAL       : in  std_logic;
             I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(32*WORDS-1 downto 0);
-            O_DONE      : out std_logic;
-            O_VAL       : out std_logic
-        );
-    end component;
-    -------------------------------------------------------------------------------
-    -- SHA1_STAGE2のコンポーネント宣言
-    -------------------------------------------------------------------------------
-    component SHA1_STAGE2
-        generic (
-            WORDS       : integer := 1
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            I_DATA      : in  std_logic_vector(32*WORDS-1 downto 0);
-            I_DONE      : in  std_logic;
-            I_VAL       : in  std_logic;
             O_DATA      : out std_logic_vector(159 downto 0);
             O_VAL       : out std_logic
         );
@@ -178,15 +155,15 @@ begin
     -------------------------------------------------------------------------------
     -- 入力処理(パディング、入力ビット数の付加).
     -------------------------------------------------------------------------------
-    PRE_PROC: SHA_PRE_PROC 
-        generic map(
-            WORD_BITS   => 32,
-            WORDS       => WORDS,
-            SYMBOL_BITS => SYMBOL_BITS,
-            SYMBOLS     => SYMBOLS,
-            REVERSE     => REVERSE
-        )
-        port map (
+    PRE_PROC: SHA_PRE_PROC               --
+        generic map(                     --
+            WORD_BITS   => 32          , --
+            WORDS       => WORDS       , --
+            SYMBOL_BITS => SYMBOL_BITS , --
+            SYMBOLS     => SYMBOLS     , --
+            REVERSE     => REVERSE       --
+        )                                --
+        port map (                       --
             CLK         => CLK         , -- In  :
             RST         => RST         , -- In  :
             CLR         => CLR         , -- In  :
@@ -202,13 +179,13 @@ begin
             O_RDY       => in_ready      -- In  :
         );
     -------------------------------------------------------------------------------
-    -- W[t]の生成.
+    -- Digestの計算.
     -------------------------------------------------------------------------------
-    STAGE1: SHA1_STAGE1
-        generic map (
-            WORDS       => WORDS
-        )
-        port map (
+    PROC: SHA1_PROC                      --
+        generic map (                    --
+            WORDS       => WORDS         -- 
+        )                                --
+        port map (                       --
             CLK         => CLK         , -- In  :
             RST         => RST         , -- In  :
             CLR         => CLR         , -- In  :
@@ -216,24 +193,6 @@ begin
             I_DONE      => in_done     , -- In  :
             I_VAL       => in_valid    , -- In  :
             I_RDY       => in_ready    , -- Out :
-            O_DATA      => word_data   , -- Out :
-            O_DONE      => word_done   , -- Out :
-            O_VAL       => word_valid    -- Out :
-        );
-    -------------------------------------------------------------------------------
-    -- Digestの計算.
-    -------------------------------------------------------------------------------
-    STAGE2: SHA1_STAGE2
-        generic map (
-            WORDS       => WORDS
-        )
-        port map (
-            CLK         => CLK         , -- In  :
-            RST         => RST         , -- In  :
-            CLR         => CLR         , -- In  :
-            I_DATA      => word_data   , -- In  :
-            I_DONE      => word_done   , -- In  :
-            I_VAL       => word_valid  , -- In  :
             O_DATA      => O_DATA      , -- Out :
             O_VAL       => O_VAL         -- Out :
         );

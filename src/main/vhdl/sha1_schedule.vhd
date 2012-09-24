@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
---!     @file    sha1_stage1.vhd
---!     @brief   SHA1 STAGE1 MODULE :
---!              SHA1用ワードデータ(W[t])生成モジュール.
---!     @version 0.0.2
---!     @date    2012/9/23
+--!     @file    sha1_schedule.vhd
+--!     @brief   SHA-1 Prepare the Message Schedule Module.
+--!              SHA-1用スケジュールモジュール.
+--!     @version 0.1.0
+--!     @date    2012/9/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -38,10 +38,10 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA1_STAGE1 :
---!          SHA1用ワードデータ(W[t])生成モジュール.
+--! @brief   SHA1_SCHEDULE :
+--!          SHA-1用ワードデータ(W[t])生成&スケジュールモジュール.
 -----------------------------------------------------------------------------------
-entity  SHA1_STAGE1 is
+entity  SHA1_SCHEDULE is
     generic (
         WORDS       : --! @brief OUTPUT WORD SIZE :
                       --! 出力側のワード数を指定する(1ワードは32bit).
@@ -74,21 +74,23 @@ entity  SHA1_STAGE1 is
     -------------------------------------------------------------------------------
     -- 出力側 I/F
     -------------------------------------------------------------------------------
-        O_DATA      : --! @brief OUTPUT WORD DATA :
+        O_DATA      : --! @brief OUTPUT MESSAGE DATA :
                       out std_logic_vector(32*WORDS-1 downto 0);
-        O_DONE      : --! @brief OUTPUT WORD DONE :
+        O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
+                      out integer range 0 to 80;
+        O_DONE      : --! @brief OUTPUT MESSAGE DONE :
                       out std_logic;
-        O_VAL       : --! @brief OUTPUT WORD VALID :
+        O_VAL       : --! @brief OUTPUT MESSAGE VALID :
                       out std_logic
     );
-end SHA1_STAGE1;
+end SHA1_SCHEDULE;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of SHA1_STAGE1 is
+architecture RTL of SHA1_SCHEDULE is
     -------------------------------------------------------------------------------
     -- １ワードのビット数
     -------------------------------------------------------------------------------
@@ -107,7 +109,7 @@ architecture RTL of SHA1_STAGE1 is
     -------------------------------------------------------------------------------
     -- 各種内部信号.
     -------------------------------------------------------------------------------
-    signal    state_count     : integer range 0 to 80/WORDS;
+    signal    state_count     : integer range 0 to 80;
     signal    input_state     : boolean;
     signal    calc_state      : boolean;
     signal    last_state      : boolean;
@@ -166,13 +168,13 @@ begin
             if    (CLR = '1' or last_state) then
                 state_count <= 0;
             elsif (valid = '1') then
-                state_count <= state_count + 1;
+                state_count <= state_count + WORDS;
             end if;
         end if;
     end process;
-    input_state <= (state_count <  16/WORDS  );
-    calc_state  <= (state_count >= 16/WORDS and state_count < 80/WORDS);
-    last_state  <= (state_count  = 80/WORDS-1);
+    input_state <= (state_count <  16 );
+    calc_state  <= (state_count >= 16 and state_count < 80);
+    last_state  <= (state_count  = 80-WORDS);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -181,11 +183,13 @@ begin
                 done   <= '0';
                 O_VAL  <= '0';
                 O_DONE <= '0';
+                O_NUM  <=  0 ;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
                 done   <= '0';
                 O_VAL  <= '0';
                 O_DONE <= '0';
+                O_NUM  <=  0 ;
             else
                 if    (input_state and I_VAL = '1' and I_DONE = '1') then
                     done <= '1';
@@ -198,6 +202,7 @@ begin
                     O_DONE <= '0';
                 end if;
                 O_VAL <= valid;
+                O_NUM <= state_count;
             end if;
         end if;
     end process;

@@ -42,7 +42,7 @@ use     ieee.std_logic_1164.all;
 entity  TEST_BENCH_1 is
     generic (
         SYMBOLS     : integer := 4;
-        WORDS       : integer := 4;
+        WORDS       : integer := 1;
         VERBOSE     : integer := 0;
         AUTO_FINISH : integer := 1
     );

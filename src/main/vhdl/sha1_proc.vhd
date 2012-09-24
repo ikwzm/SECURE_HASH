@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
---!     @file    sha1_stage2.vhd
---!     @brief   SHA1 STAGE2 Processing MODULE :
---!              SHA1用計算モジュール.
---!     @version 0.0.2
---!     @date    2012/9/23
+--!     @file    sha1_proc.vhd
+--!     @brief   SHA-1 Processing Module :
+--!              SHA-1用計算モジュール.
+--!     @version 0.1.0
+--!     @date    2012/9/24
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -39,25 +39,45 @@ library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
 --! @brief   SHA1_PROC :
---!          SHA1の計算.
+--!          SHA-1用計算モジュール.
 -----------------------------------------------------------------------------------
 entity  SHA1_PROC is
     generic (
-        NUM         : integer := 1
+        WORDS       : --! @brief OUTPUT WORD SIZE :
+                      --! 出力側のワード数を指定する(1ワードは32bit).
+                      integer := 1
     );
     port (
-        T           : in  integer range 0 to 127;
-        W           : in  std_logic_vector(31 downto 0);
-        Ai          : in  std_logic_vector(31 downto 0);
-        Bi          : in  std_logic_vector(31 downto 0);
-        Ci          : in  std_logic_vector(31 downto 0);
-        Di          : in  std_logic_vector(31 downto 0);
-        Ei          : in  std_logic_vector(31 downto 0);
-        Ao          : out std_logic_vector(31 downto 0);
-        Bo          : out std_logic_vector(31 downto 0);
-        Co          : out std_logic_vector(31 downto 0);
-        Do          : out std_logic_vector(31 downto 0);
-        Eo          : out std_logic_vector(31 downto 0)
+    -------------------------------------------------------------------------------
+    -- クロック&リセット信号
+    -------------------------------------------------------------------------------
+        CLK         : --! @brief CLOCK :
+                      --! クロック信号
+                      in  std_logic; 
+        RST         : --! @brief ASYNCRONOUSE RESET :
+                      --! 非同期リセット信号.アクティブハイ.
+                      in  std_logic;
+        CLR         : --! @brief SYNCRONOUSE RESET :
+                      --! 同期リセット信号.アクティブハイ.
+                      in  std_logic;
+    -------------------------------------------------------------------------------
+    -- 入力側 I/F
+    -------------------------------------------------------------------------------
+        I_DATA      : --! @brief INPUT WORD DATA :
+                      in  std_logic_vector(32*WORDS-1 downto 0);
+        I_DONE      : --! @brief INPUT WORD DATA DONE :
+                      in  std_logic;
+        I_VAL       : --! @brief INPUT WORD DATA VALID :
+                      in  std_logic;
+        I_RDY       : --! @brief INPUT WORD DATA READY :
+                      out std_logic;
+    -------------------------------------------------------------------------------
+    -- 出力側 I/F
+    -------------------------------------------------------------------------------
+        O_DATA      : --! @brief OUTPUT WORD DATA :
+                      out std_logic_vector(159 downto 0);
+        O_VAL       : --! @brief OUTPUT WORD VALID :
+                      out std_logic
     );
 end SHA1_PROC;
 -----------------------------------------------------------------------------------
@@ -67,46 +87,214 @@ library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 architecture RTL of SHA1_PROC is
-    signal   a0 : unsigned(31 downto 0);
-    signal   a1 : unsigned(31 downto 0);
-    signal   a2 : unsigned(31 downto 0);
-    signal   a3 : unsigned(31 downto 0);
-    signal   a4 : unsigned(31 downto 0);
-    constant k0 : unsigned(31 downto 0) := "01011010100000100111100110011001"; -- 0x5A827999
-    constant k1 : unsigned(31 downto 0) := "01101110110110011110101110100001"; -- 0x6ED9EBA1
-    constant k2 : unsigned(31 downto 0) := "10001111000110111011110011011100"; -- 0x8F1BBCDC
-    constant k3 : unsigned(31 downto 0) := "11001010011000101100000111010110"; -- 0xCA62C1D6
-    function Func00_19(B,C,D:std_logic_vector) return unsigned is
-    begin
-        return unsigned((B and C) or ((not B) and D));
-    end function;
-    function Func20_39(B,C,D:std_logic_vector) return unsigned is
-    begin
-        return unsigned(B xor C xor D);
-    end function;
-    function Func40_59(B,C,D:std_logic_vector) return unsigned is
-    begin
-        return unsigned((B and C) or (B and D) or (C and D));
-    end function;
-    function Func60_79(B,C,D:std_logic_vector) return unsigned is
-    begin
-        return unsigned(B xor C xor D);
-    end function;
+    -------------------------------------------------------------------------------
+    -- １ワードのビット数
+    -------------------------------------------------------------------------------
+    constant  WORD_BITS       : integer := 32;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
+    type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
+    constant  WORD_NULL       : WORD_TYPE := (others => '0');
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    signal    word_num  : integer range 0 to 80;
+    signal    word_data : std_logic_vector(WORD_BITS*WORDS-1 downto 0);
+    signal    word_done : std_logic;
+    signal    word_valid: std_logic;
+    signal    a         : WORD_VECTOR(0 to WORDS);
+    signal    b         : WORD_VECTOR(0 to WORDS);
+    signal    c         : WORD_VECTOR(0 to WORDS);
+    signal    d         : WORD_VECTOR(0 to WORDS);
+    signal    e         : WORD_VECTOR(0 to WORDS);
+    signal    a_reg     : WORD_TYPE;
+    signal    b_reg     : WORD_TYPE;
+    signal    c_reg     : WORD_TYPE;
+    signal    d_reg     : WORD_TYPE;
+    signal    e_reg     : WORD_TYPE;
+    signal    h0        : WORD_TYPE;
+    signal    h1        : WORD_TYPE;
+    signal    h2        : WORD_TYPE;
+    signal    h3        : WORD_TYPE;
+    signal    h4        : WORD_TYPE;
+    constant  H0_INIT   : WORD_TYPE := "01100111010001010010001100000001"; -- 0x67452301
+    constant  H1_INIT   : WORD_TYPE := "11101111110011011010101110001001"; -- 0xEFCDAB89
+    constant  H2_INIT   : WORD_TYPE := "10011000101110101101110011111110"; -- 0x98BADCFE
+    constant  H3_INIT   : WORD_TYPE := "00010000001100100101010001110110"; -- 0x10325476
+    constant  H4_INIT   : WORD_TYPE := "11000011110100101110000111110000"; -- 0xC3D2E1F0
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    component SHA1_SCHEDULE
+        generic (
+            WORDS       : integer := 1
+        );
+        port (
+            CLK         : in  std_logic; 
+            RST         : in  std_logic;
+            CLR         : in  std_logic;
+            I_DATA      : in  std_logic_vector(32*WORDS-1 downto 0);
+            I_DONE      : in  std_logic;
+            I_VAL       : in  std_logic;
+            I_RDY       : out std_logic;
+            O_DATA      : out std_logic_vector(32*WORDS-1 downto 0);
+            O_DONE      : out std_logic;
+            O_NUM       : out integer range 0 to 80;
+            O_VAL       : out std_logic
+        );
+    end component;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    component SHA1_CALC is
+        generic (
+            NUM         : integer := 1
+        );
+        port (
+            T           : in  integer range 0 to 127;
+            W           : in  std_logic_vector(31 downto 0);
+            Ai          : in  std_logic_vector(31 downto 0);
+            Bi          : in  std_logic_vector(31 downto 0);
+            Ci          : in  std_logic_vector(31 downto 0);
+            Di          : in  std_logic_vector(31 downto 0);
+            Ei          : in  std_logic_vector(31 downto 0);
+            Ao          : out std_logic_vector(31 downto 0);
+            Bo          : out std_logic_vector(31 downto 0);
+            Co          : out std_logic_vector(31 downto 0);
+            Do          : out std_logic_vector(31 downto 0);
+            Eo          : out std_logic_vector(31 downto 0)
+        );
+    end component;
 begin
-    a0 <= unsigned(Ai(Ai'high-5 downto Ai'low) & Ai(Ai'high downto Ai'high-5+1));
-    a1 <= Func00_19(Bi,Ci,Di) when ( 0 <= T+NUM and T+NUM <= 19) else
-          Func20_39(Bi,Ci,Di) when (20 <= T+NUM and T+NUM <= 39) else
-          Func40_59(Bi,Ci,Di) when (40 <= T+NUM and T+NUM <= 59) else
-          Func60_79(Bi,Ci,Di);
-    a2 <= unsigned(Ei);
-    a3 <= unsigned(W);
-    a4 <= k0 when ( 0 <= T+NUM and T+NUM <= 19) else
-          k1 when (20 <= T+NUM and T+NUM <= 39) else
-          k2 when (40 <= T+NUM and T+NUM <= 59) else
-          k3;
-    Ao <= std_logic_vector(a0+a1+a2+a3+a4);
-    Bo <= Ai;
-    Co <= Bi(Bi'high-30 downto Bi'low) & Bi(Bi'high downto Bi'high-30+1);
-    Do <= Ci;
-    Eo <= Di;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    SCHEDULE: SHA1_SCHEDULE
+        generic map (
+            WORDS       => WORDS
+        )
+        port map (
+            CLK         => CLK         , -- In  :
+            RST         => RST         , -- In  :
+            CLR         => CLR         , -- In  :
+            I_DATA      => I_DATA      , -- In  :
+            I_DONE      => I_DONE      , -- In  :
+            I_VAL       => I_VAL       , -- In  :
+            I_RDY       => I_RDY       , -- Out :
+            O_DATA      => word_data   , -- Out :
+            O_NUM       => word_num    , -- Out :
+            O_DONE      => word_done   , -- Out :
+            O_VAL       => word_valid    -- Out :
+        );
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    a(0) <= a_reg;
+    b(0) <= b_reg;
+    c(0) <= c_reg;
+    d(0) <= d_reg;
+    e(0) <= e_reg;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    CALC: for i in 0 to WORDS-1 generate
+        U: SHA1_CALC generic map(i) port map(
+            T  => word_num,                           -- In  :
+            W  => word_data(32*(i+1)-1 downto 32*i),  -- In  :
+            Ai => a(i),                               -- In  :
+            Bi => b(i),                               -- In  :
+            Ci => c(i),                               -- In  :
+            Di => d(i),                               -- In  :
+            Ei => e(i),                               -- In  :
+            Ao => a(i+1),                             -- Out :
+            Bo => b(i+1),                             -- Out :
+            Co => c(i+1),                             -- Out :
+            Do => d(i+1),                             -- Out :
+            Eo => e(i+1)                              -- Out :
+        );
+    end generate;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    process (CLK, RST)
+        variable h0_next : std_logic_vector(31 downto 0);
+        variable h1_next : std_logic_vector(31 downto 0);
+        variable h2_next : std_logic_vector(31 downto 0);
+        variable h3_next : std_logic_vector(31 downto 0);
+        variable h4_next : std_logic_vector(31 downto 0);
+    begin
+        if (RST = '1') then
+                h0     <= H0_INIT;
+                h1     <= H1_INIT;
+                h2     <= H2_INIT;
+                h3     <= H3_INIT;
+                h4     <= H4_INIT;
+                a_reg  <= H0_INIT;
+                b_reg  <= H1_INIT;
+                c_reg  <= H2_INIT;
+                d_reg  <= H3_INIT;
+                e_reg  <= H4_INIT;
+                O_DATA <= (others => '0');
+                O_VAL  <= '0';
+        elsif (CLK'event and CLK = '1') then
+            if (CLR = '1') then
+                h0     <= H0_INIT;
+                h1     <= H1_INIT;
+                h2     <= H2_INIT;
+                h3     <= H3_INIT;
+                h4     <= H4_INIT;
+                a_reg  <= H0_INIT;
+                b_reg  <= H1_INIT;
+                c_reg  <= H2_INIT;
+                d_reg  <= H3_INIT;
+                e_reg  <= H4_INIT;
+                O_DATA <= (others => '0');
+                O_VAL  <= '0';
+            elsif (word_valid = '1') then
+                h0_next := std_logic_vector(unsigned(h0) + unsigned(a(a'high)));
+                h1_next := std_logic_vector(unsigned(h1) + unsigned(b(b'high)));
+                h2_next := std_logic_vector(unsigned(h2) + unsigned(c(c'high)));
+                h3_next := std_logic_vector(unsigned(h3) + unsigned(d(d'high)));
+                h4_next := std_logic_vector(unsigned(h4) + unsigned(e(e'high)));
+                if (word_done = '1') then
+                    h0     <= H0_INIT;
+                    h1     <= H1_INIT;
+                    h2     <= H2_INIT;
+                    h3     <= H3_INIT;
+                    h4     <= H4_INIT;
+                    a_reg  <= H0_INIT;
+                    b_reg  <= H1_INIT;
+                    c_reg  <= H2_INIT;
+                    d_reg  <= H3_INIT;
+                    e_reg  <= H4_INIT;
+                    O_DATA <= h0_next & h1_next & h2_next & h3_next & h4_next;
+                    O_VAL  <= '1';
+                else
+                    O_VAL  <= '0';
+                    if (word_num < 80-WORDS) then
+                        a_reg <= a(a'high);
+                        b_reg <= b(b'high);
+                        c_reg <= c(c'high);
+                        d_reg <= d(d'high);
+                        e_reg <= e(e'high);
+                    else
+                        a_reg <= h0_next;
+                        b_reg <= h1_next;
+                        c_reg <= h2_next;
+                        d_reg <= h3_next;
+                        e_reg <= h4_next;
+                        h0    <= h0_next;
+                        h1    <= h1_next;
+                        h2    <= h2_next;
+                        h3    <= h3_next;
+                        h4    <= h4_next;
+                    end if;
+                end if;
+            else
+                    O_VAL  <= '0';
+            end if;
+        end if;
+    end process;
 end RTL;

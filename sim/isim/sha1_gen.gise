@@ -90,17 +90,21 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1348434985" xil_pn:in_ck="-3668198434724051466" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1348434985">
+    <transform xil_pn:end_ts="1348487471" xil_pn:in_ck="-522870334320415900" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1348487471">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
       <outfile xil_pn:name="../../PipeWork/src/main/vhdl/components/components.vhd"/>
       <outfile xil_pn:name="../../PipeWork/src/main/vhdl/components/reducer.vhd"/>
       <outfile xil_pn:name="../../src/main/vhdl/sha1.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_input.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha1_calc.vhd"/>
       <outfile xil_pn:name="../../src/main/vhdl/sha1_proc.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_stage1.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_stage2.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha1_schedule.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha_pre_proc.vhd"/>
       <outfile xil_pn:name="../../src/test/vhdl/test_bench_1.vhd"/>
     </transform>
     <transform xil_pn:end_ts="1348394989" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="5237868769025829030" xil_pn:start_ts="1348394989">
@@ -111,30 +115,35 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1348394989" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="-813141779194417645" xil_pn:start_ts="1348394989">
+    <transform xil_pn:end_ts="1348487471" xil_pn:name="TRAN_regenerateCoresSim" xil_pn:prop_ck="-4571171008785196750" xil_pn:start_ts="1348487471">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <status xil_pn:value="OutOfDateForProperties"/>
     </transform>
-    <transform xil_pn:end_ts="1348434985" xil_pn:in_ck="-3668198434724051466" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1348434985">
+    <transform xil_pn:end_ts="1348487471" xil_pn:in_ck="-522870334320415900" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1348487471">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="../../Dummy_Plug/src/main/vhdl/core/util.vhd"/>
       <outfile xil_pn:name="../../PipeWork/src/main/vhdl/components/components.vhd"/>
       <outfile xil_pn:name="../../PipeWork/src/main/vhdl/components/reducer.vhd"/>
       <outfile xil_pn:name="../../src/main/vhdl/sha1.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_input.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha1_calc.vhd"/>
       <outfile xil_pn:name="../../src/main/vhdl/sha1_proc.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_stage1.vhd"/>
-      <outfile xil_pn:name="../../src/main/vhdl/sha1_stage2.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha1_schedule.vhd"/>
+      <outfile xil_pn:name="../../src/main/vhdl/sha_pre_proc.vhd"/>
       <outfile xil_pn:name="../../src/test/vhdl/test_bench_1.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1348434997" xil_pn:in_ck="-3668198434724051466" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="8476977846437276459" xil_pn:start_ts="1348434985">
+    <transform xil_pn:end_ts="1348487482" xil_pn:in_ck="-522870334320415900" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="8476977846437276459" xil_pn:start_ts="1348487471">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="TEST_BENCH_1_beh.prj"/>
       <outfile xil_pn:name="TEST_BENCH_1_isim_beh.exe"/>
@@ -143,7 +152,7 @@
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1348434998" xil_pn:in_ck="-2812248531556645666" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="3638582848282220856" xil_pn:start_ts="1348434997">
+    <transform xil_pn:end_ts="1348487483" xil_pn:in_ck="-2812248531556645666" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="3638582848282220856" xil_pn:start_ts="1348487482">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
@@ -185,6 +194,8 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="InputChanged"/>
       <outfile xil_pn:name="SHA1.lso"/>
       <outfile xil_pn:name="SHA1.ngc"/>
       <outfile xil_pn:name="SHA1.ngr"/>
@@ -205,6 +216,7 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="InputChanged"/>
       <outfile xil_pn:name="SHA1.bld"/>
       <outfile xil_pn:name="SHA1.ngd"/>
