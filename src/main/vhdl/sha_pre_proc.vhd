@@ -2,8 +2,8 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.1.0
---!     @date    2012/9/24
+--!     @version 0.1.1
+--!     @date    2012/9/25
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -348,7 +348,7 @@ begin
         ---------------------------------------------------------------------------
         -- next_delimiter :
         ---------------------------------------------------------------------------
-        if (curr_state = INPUT_STATE and i_done = '1' and prev_valid and SYMBOL_BITS > 0) then
+        if (curr_state = INPUT_STATE and ibuf_done = '1' and prev_valid and SYMBOL_BITS > 0) then
             next_delimiter <= "1";
         else
             next_delimiter <= "0";
@@ -407,7 +407,7 @@ begin
                     out_data  := in_data;
                     out_done  <= '0';
                     out_valid <= ibuf_valid;
-                    if (i_done = '1') then
+                    if (ibuf_done = '1') then
                         if (remain_out_size = 1 and padding_done) then
                             next_state <= LAST_STATE;
                         else
