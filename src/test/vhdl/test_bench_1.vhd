@@ -43,7 +43,7 @@ entity  TEST_BENCH_1 is
     generic (
         SYMBOLS     : integer := 4;
         WORDS       : integer := 1;
-        VERBOSE     : integer := 0;
+        VERBOSE     : integer := 1;
         AUTO_FINISH : integer := 1
     );
     port (
@@ -157,8 +157,6 @@ begin
     -- 
     -------------------------------------------------------------------------------
     process
-        variable  exp_digest : std_logic_vector(159 downto 0);
-        variable  str_len    : integer;
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
@@ -174,9 +172,10 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        procedure INPUT_SYMBOL(VEC:SYMBOL_VECTOR;OFF:integer;LAST:boolean) is
+        procedure INPUT_SYMBOL(VEC:SYMBOL_VECTOR;CNT,OFF:integer;LAST,DONE:boolean) is
             variable i_pos : integer;
             variable v_pos : integer;
+            variable count : integer;
         begin
             I_VAL  <= '0'             after DELAY;
             I_LAST <= '0'             after DELAY;
@@ -185,6 +184,7 @@ begin
             I_DATA <= (others => '0') after DELAY;
             i_pos := OFF;
             v_pos := VEC'low;
+            count := 0;
             MAIN_LOOP: loop
                 for i in I_ENA'low to I_ENA'high loop
                     if (i >= i_pos and v_pos <= VEC'high) then
@@ -198,17 +198,22 @@ begin
                 end loop;
                 i_pos := 0;
                 I_VAL <= '1' after DELAY;
-                if (LAST and v_pos > VEC'high) then
-                    I_LAST <= '1' after DELAY;
-                else
-                    I_LAST <= '0' after DELAY;
+                if (v_pos > VEC'high) then
+                    count := count + 1;
+                    v_pos := VEC'low;
+                    if (LAST and count >= CNT) then
+                        I_LAST <= '1' after DELAY;
+                    else
+                        I_LAST <= '0' after DELAY;
+                    end if;
                 end if;
                 wait until (CLK'event and CLK = '1' and I_RDY = '1');
                 I_VAL  <= '0' after DELAY;
                 I_LAST <= '0' after DELAY;
-                exit when (v_pos > VEC'high);
+                exit when (count >= CNT);
             end loop;
-            if (not LAST) then
+            if (DONE) then
+                wait until (CLK'event and CLK = '1' and I_RDY = '1');
                 I_DONE <= '1' after DELAY;
                 wait until (CLK'event and CLK = '1');
             end if;
@@ -217,6 +222,41 @@ begin
             I_DONE <= '0'             after DELAY;
             I_ENA  <= (others => '0') after DELAY;
             I_DATA <= (others => '0') after DELAY;
+        end procedure;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        procedure RUN_TEST(CNT:integer;MES,EXP:STRING) is
+            variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
+            variable  exp_digest : std_logic_vector(159 downto 0);
+            variable  str_len    : integer;
+        begin
+            message := STRING_TO_SYMBOL_VECTOR(MES);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => EXP, 
+                VAL     => exp_digest,
+                STR_LEN => str_len
+            );
+            for offset in 0 to SYMBOLS-2 loop
+                assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " 1" severity NOTE;
+                INPUT_SYMBOL(message, CNT, offset, TRUE, FALSE);
+                assert(VERBOSE=0) report MESSAGE_TAG & "Wait " &  SCENARIO severity NOTE;
+                wait until (CLK'event and CLK = '1' and O_VAL = '1');
+                assert (O_DATA = exp_digest)
+                    report MESSAGE_TAG & "Mismatch " & SCENARIO &
+                           " O_DATA="   & HEX_TO_STRING(O_DATA) &
+                           ",EXP_DATA=" & HEX_TO_STRING(exp_digest) severity Error;
+            end loop;
+            for offset in 0 to SYMBOLS-2 loop
+                assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " 2" severity NOTE;
+                INPUT_SYMBOL(message, CNT, offset, FALSE, TRUE);
+                assert(VERBOSE=0) report MESSAGE_TAG & "Wait " &  SCENARIO severity NOTE;
+                wait until (CLK'event and CLK = '1' and O_VAL = '1');
+                assert (O_DATA = exp_digest)
+                    report MESSAGE_TAG & "Mismatch " & SCENARIO &
+                           " O_DATA="   & HEX_TO_STRING(O_DATA) &
+                           ",EXP_DATA=" & HEX_TO_STRING(exp_digest) severity Error;
+            end loop;
         end procedure;
     begin
         ---------------------------------------------------------------------------
@@ -238,19 +278,22 @@ begin
         -- 
         ---------------------------------------------------------------------------
         SCENARIO <= "TEST1";
-        assert(VERBOSE=0) report MESSAGE_TAG & "Starting " & SCENARIO severity NOTE;
-        INPUT_SYMBOL(STRING_TO_SYMBOL_VECTOR(TEST1), 0, TRUE);
-        STRING_TO_STD_LOGIC_VECTOR(
-            STR     => string'("0xA9993E364706816ABA3E25717850C26C9CD0D89D"),
-            VAL     => exp_digest,
-            STR_LEN => str_len
-        );
-        assert(VERBOSE=0) report MESSAGE_TAG & "Wait " &  SCENARIO severity NOTE;
-        wait until (CLK'event and CLK = '1' and O_VAL = '1');
-        assert (O_DATA = exp_digest)
-            report MESSAGE_TAG & "Mismatch TEST1 " & 
-                   "O_DATA="    & HEX_TO_STRING(O_DATA) &
-                   ",EXP_DATA=" & HEX_TO_STRING(exp_digest) severity Error;
+        wait for 0 ns;
+        assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Start" severity NOTE;
+        RUN_TEST(1,
+                 string'("abc"),
+                 string'("0xA9993E364706816ABA3E25717850C26C9CD0D89D"));
+        assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Done." severity NOTE;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        SCENARIO <= "TEST2";
+        wait for 0 ns;
+        assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Start" severity NOTE;
+        RUN_TEST(1,
+                 string'("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"),
+                 string'("0x84983E441C3BD26EBAAE4AA1F95129E5E54670F1"));
+        assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Done." severity NOTE;
         ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
