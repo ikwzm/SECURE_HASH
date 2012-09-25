@@ -2,7 +2,7 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.1.1
+--!     @version 0.1.2
 --!     @date    2012/9/25
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -217,7 +217,8 @@ begin
             ENBL_BITS   => 1                    , -- I_ENAはシンボル毎に1ビット.
             I_WIDTH     => SYMBOLS              , -- 入力側のシンボル数.
             O_WIDTH     => OUT_SYMBOLS          , -- 出力側のシンボル数.
-            QUEUE_SIZE  => 0                    , -- キューのサイズはI_BUFにおまかせ.
+            QUEUE_SIZE  => OUT_SYMBOLS+SYMBOLS    -- キューのサイズ
+                           +SYMBOLS-1           , -- 
             VALID_MIN   => ibuf_word_valid'low  , -- ibuf_word_validの範囲の最小値.
             VALID_MAX   => ibuf_word_valid'high , -- ibuf_word_validの範囲の最大値.
             I_JUSTIFIED => 0                    , -- 入力シンボルはLSB側に詰められているわけではない.
