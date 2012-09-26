@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1.vhd
 --!     @brief   SHA-1 MODULE :
---!     @version 0.1.0
---!     @date    2012/9/24
+--!     @version 0.2.0
+--!     @date    2012/9/26
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -101,10 +101,10 @@ architecture RTL of SHA1 is
     -------------------------------------------------------------------------------
     -- 内部信号
     -------------------------------------------------------------------------------
-    signal    in_word   : std_logic_vector(32*WORDS-1 downto 0);
-    signal    in_done   : std_logic;
-    signal    in_valid  : std_logic;
-    signal    in_ready  : std_logic;
+    signal    m_word    : std_logic_vector(32*WORDS-1 downto 0);
+    signal    m_done    : std_logic;
+    signal    m_valid   : std_logic;
+    signal    m_ready   : std_logic;
     -------------------------------------------------------------------------------
     -- SHA_PRE_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
@@ -126,10 +126,10 @@ architecture RTL of SHA1 is
             I_LAST      : in  std_logic;
             I_VAL       : in  std_logic;
             I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(WORD_BITS*WORDS-1 downto 0);
-            O_DONE      : out std_logic;
-            O_VAL       : out std_logic;
-            O_RDY       : in  std_logic
+            M_DATA      : out std_logic_vector(WORD_BITS*WORDS-1 downto 0);
+            M_DONE      : out std_logic;
+            M_VAL       : out std_logic;
+            M_RDY       : in  std_logic
         );
     end component;
     -------------------------------------------------------------------------------
@@ -143,10 +143,10 @@ architecture RTL of SHA1 is
             CLK         : in  std_logic; 
             RST         : in  std_logic;
             CLR         : in  std_logic;
-            I_DATA      : in  std_logic_vector(32*WORDS-1 downto 0);
-            I_DONE      : in  std_logic;
-            I_VAL       : in  std_logic;
-            I_RDY       : out std_logic;
+            M_DATA      : in  std_logic_vector(32*WORDS-1 downto 0);
+            M_DONE      : in  std_logic;
+            M_VAL       : in  std_logic;
+            M_RDY       : out std_logic;
             O_DATA      : out std_logic_vector(159 downto 0);
             O_VAL       : out std_logic
         );
@@ -173,10 +173,10 @@ begin
             I_LAST      => I_LAST      , -- In  :
             I_VAL       => I_VAL       , -- In  :
             I_RDY       => I_RDY       , -- Out :
-            O_DATA      => in_word     , -- Out :
-            O_DONE      => in_done     , -- Out :
-            O_VAL       => in_valid    , -- Out :
-            O_RDY       => in_ready      -- In  :
+            M_DATA      => m_word      , -- Out :
+            M_DONE      => m_done      , -- Out :
+            M_VAL       => m_valid     , -- Out :
+            m_RDY       => m_ready       -- In  :
         );
     -------------------------------------------------------------------------------
     -- Digestの計算.
@@ -189,10 +189,10 @@ begin
             CLK         => CLK         , -- In  :
             RST         => RST         , -- In  :
             CLR         => CLR         , -- In  :
-            I_DATA      => in_word     , -- In  :
-            I_DONE      => in_done     , -- In  :
-            I_VAL       => in_valid    , -- In  :
-            I_RDY       => in_ready    , -- Out :
+            M_DATA      => m_word      , -- In  :
+            M_DONE      => m_done      , -- In  :
+            M_VAL       => m_valid     , -- In  :
+            M_RDY       => m_ready     , -- Out :
             O_DATA      => O_DATA      , -- Out :
             O_VAL       => O_VAL         -- Out :
         );

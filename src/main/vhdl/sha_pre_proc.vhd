@@ -2,8 +2,8 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.1.2
---!     @date    2012/9/25
+--!     @version 0.2.0
+--!     @date    2012/9/26
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -93,13 +93,13 @@ entity  SHA_PRE_PROC is
     -------------------------------------------------------------------------------
     -- 出力側 I/F
     -------------------------------------------------------------------------------
-        O_DATA      : --! @brief OUTPUT WORD DATA :
+        M_DATA      : --! @brief OUTPUT MESSAGE DATA :
                       out std_logic_vector(WORD_BITS*WORDS-1 downto 0);
-        O_DONE      : --! @brief OUTPUT WORD DONE :
+        M_DONE      : --! @brief OUTPUT MESSAGE DONE :
                       out std_logic;
-        O_VAL       : --! @brief OUTPUT WORD VALID :
+        M_VAL       : --! @brief OUTPUT MESSAGE VALID :
                       out std_logic;
-        O_RDY       : --! @brief OUTPUT WORD READY :
+        M_RDY       : --! @brief OUTPUE MESSAGE READY :
                       in  std_logic
     );
 end SHA_PRE_PROC;
@@ -578,11 +578,11 @@ begin
         ---------------------------------------------------------------------------
         -- 出力側 I/F
         ---------------------------------------------------------------------------
-            O_DATA      => O_DATA               , -- Out : ワードデータ出力.
+            O_DATA      => M_DATA               , -- Out : メッセージ出力.
             O_ENBL      => open                 , -- Out : 未使用のためオープン.
-            O_DONE      => O_DONE               , -- Out :
+            O_DONE      => M_DONE               , -- Out :
             O_FLUSH     => open                 , -- Out : 未使用のためオープン.
-            O_VAL       => O_VAL                , -- Out : 出力データ有効信号.
-            O_RDY       => O_RDY                  -- In  : 出力データ許可信号.
+            O_VAL       => M_VAL                , -- Out : メッセージ有効信号.
+            O_RDY       => M_RDY                  -- In  : メッセージ許可信号.
         );
 end RTL;

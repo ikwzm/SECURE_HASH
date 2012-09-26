@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------
---!     @file    sha1_schedule.vhd
---!     @brief   SHA-1 Prepare the Message Schedule Module.
---!              SHA-1用スケジュールモジュール.
---!     @version 0.1.0
---!     @date    2012/9/24
+--!     @file    sha_schedule.vhd
+--!     @brief   SHA-1/2 Prepare the Message Schedule Module.
+--!              SHA-1/2 用スケジュールモジュール.
+--!     @version 0.2.0
+--!     @date    2012/9/26
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -38,14 +38,28 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA1_SCHEDULE :
---!          SHA-1用ワードデータ(W[t])生成&スケジュールモジュール.
+--! @brief   SHA_SCHEDULE :
+--!          SHA-1/2用スケジュールモジュール.
 -----------------------------------------------------------------------------------
-entity  SHA1_SCHEDULE is
+entity  SHA_SCHEDULE is
     generic (
-        WORDS       : --! @brief OUTPUT WORD SIZE :
-                      --! 出力側のワード数を指定する(1ワードは32bit).
-                      integer := 1
+        WORD_BITS   : --! @brief SHA-1/2 WORD BITS :
+                      --! １ワードのビット数を指定する.
+                      --! * SHA-1/SHA-256の場合は32を設定する.
+                      --! * SHA-512の場合は64を設定する.
+                      integer := 32;
+        WORDS       : --! @brief SHA-1/2 WORD SIZE :
+                      --! １クロックで処理するワード数を指定する.
+                      integer := 1;
+        INPUT_NUM   : --! @brief INPUT END NUMBER :
+                      integer := 16;
+        CALC_NUM    : --! @brief CALC END NUMBER :
+                      --! SHA-1では80, SHA-2では64
+                      integer := 80;
+        END_OF_NUM  : --! @brief END OF NUMBER :
+                      --! 最後のスケジューリング番号を指定する.
+                      --! SHA-1では80, SHA-2では64
+                      integer := 80
     );
     port (
     -------------------------------------------------------------------------------
@@ -63,92 +77,44 @@ entity  SHA1_SCHEDULE is
     -------------------------------------------------------------------------------
     -- 入力側 I/F
     -------------------------------------------------------------------------------
-        I_DATA      : --! @brief INPUT WORD DATA :
-                      in  std_logic_vector(32*WORDS-1 downto 0);
-        I_DONE      : --! @brief INPUT WORD DATA DONE :
+        I_DONE      : --! @brief INPUT MESSAGE DONE  :
                       in  std_logic;
-        I_VAL       : --! @brief INPUT WORD DATA VALID :
+        I_VAL       : --! @brief INPUT MESSAGE VALID :
                       in  std_logic;
-        I_RDY       : --! @brief INPUT WORD DATA READY :
+        I_RDY       : --! @brief INPUT MESSAGE READY :
                       out std_logic;
     -------------------------------------------------------------------------------
     -- 出力側 I/F
     -------------------------------------------------------------------------------
-        O_DATA      : --! @brief OUTPUT MESSAGE DATA :
-                      out std_logic_vector(32*WORDS-1 downto 0);
-        O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
-                      out integer range 0 to 80;
-        O_DONE      : --! @brief OUTPUT MESSAGE DONE :
+        O_INPUT     : --! @brief INPUT MESSAGE PHASE :
+                     out std_logic;
+        O_LAST      : --! @brief LAST WORD OF MESSAGE :
+                      out std_logic;
+        O_DONE      : --! @brief MESSAGE DONE :
                       out std_logic;
         O_VAL       : --! @brief OUTPUT MESSAGE VALID :
-                      out std_logic
+                      out std_logic;
+        O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
+                      out integer range 0 to END_OF_NUM-1
     );
-end SHA1_SCHEDULE;
+end SHA_SCHEDULE;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of SHA1_SCHEDULE is
-    -------------------------------------------------------------------------------
-    -- １ワードのビット数
-    -------------------------------------------------------------------------------
-    constant  WORD_BITS       : integer := 32;
-    -------------------------------------------------------------------------------
-    -- W[t]の型定義.
-    -------------------------------------------------------------------------------
-    subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
-    type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
-    constant  WORD_NULL       : WORD_TYPE := (others => '0');
-    -------------------------------------------------------------------------------
-    -- W[t]配列
-    -------------------------------------------------------------------------------
-    signal    word_regs       : WORD_VECTOR(0 to 15);
-    signal    word_work       : WORD_VECTOR(0 to 15 + WORDS);
+architecture RTL of SHA_SCHEDULE is
     -------------------------------------------------------------------------------
     -- 各種内部信号.
     -------------------------------------------------------------------------------
-    signal    state_count     : integer range 0 to 80;
+    signal    state_count     : integer range 0 to END_OF_NUM-1;
     signal    input_state     : boolean;
     signal    calc_state      : boolean;
     signal    last_state      : boolean;
     signal    valid           : std_logic;
     signal    done            : std_logic;
-    -------------------------------------------------------------------------------
-    -- ローテート演算関数.
-    -------------------------------------------------------------------------------
-    function  ROTATE(ARG:WORD_TYPE) return WORD_TYPE is
-    begin
-        return ARG(WORD_TYPE'high-1 downto WORD_TYPE'low ) &
-               ARG(WORD_TYPE'high   downto WORD_TYPE'high);
-    end function;
 begin
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    word_work(0 to 15) <= word_regs(0 to 15);
-    WGEN: for i in 0 to WORDS-1 generate
-        word_work(16+i) <= I_DATA(WORD_BITS*(i+1)-1 downto WORD_BITS*i) when (input_state) else
-                           ROTATE(word_work(16+i-3 ) xor
-                                  word_work(16+i-8 ) xor
-                                  word_work(16+i-14) xor
-                                  word_work(16+i-16));
-    end generate;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    process (CLK, RST) begin
-        if (RST = '1') then
-                word_regs <= (others => WORD_NULL);
-        elsif (CLK'event and CLK = '1') then
-            if (CLR = '1') then
-                word_regs <= (others => WORD_NULL);
-            elsif (valid = '1') then
-                word_regs <= word_work(WORDS to WORDS+15);
-            end if;
-        end if;
-    end process;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -172,44 +138,31 @@ begin
             end if;
         end if;
     end process;
-    input_state <= (state_count <  16 );
-    calc_state  <= (state_count >= 16 and state_count < 80);
-    last_state  <= (state_count  = 80-WORDS);
+    input_state <= (state_count <  INPUT_NUM);
+    calc_state  <= (state_count >= INPUT_NUM and state_count < CALC_NUM);
+    last_state  <= (state_count  = END_OF_NUM-WORDS);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
                 done   <= '0';
-                O_VAL  <= '0';
-                O_DONE <= '0';
-                O_NUM  <=  0 ;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
                 done   <= '0';
-                O_VAL  <= '0';
-                O_DONE <= '0';
-                O_NUM  <=  0 ;
-            else
-                if    (input_state and I_VAL = '1' and I_DONE = '1') then
-                    done <= '1';
-                elsif (last_state) then
-                    done <= '0';
-                end if;
-                if (last_state and done = '1') then
-                    O_DONE <= '1';
-                else
-                    O_DONE <= '0';
-                end if;
-                O_VAL <= valid;
-                O_NUM <= state_count;
+            elsif (input_state and I_VAL = '1' and I_DONE = '1') then
+                done <= '1';
+            elsif (last_state) then
+                done <= '0';
             end if;
         end if;
     end process;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    O_DATA_GEN: for i in 0 to WORDS-1 generate
-        O_DATA(WORD_BITS*(i+1)-1 downto WORD_BITS*i) <= word_regs(16-WORDS+i);
-    end generate;
+    O_VAL   <= valid;
+    O_NUM   <= state_count;
+    O_INPUT <= '1' when (input_state) else '0';
+    O_LAST  <= '1' when (state_count = CALC_NUM-WORDS) else '0';
+    O_DONE  <= '1' when (last_state and done = '1') else '0';
 end RTL;
