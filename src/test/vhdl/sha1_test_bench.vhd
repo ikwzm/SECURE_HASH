@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    test_bench_1.vhd
---!     @brief   SHA1 TEST BENCH No.1 :
---!     @version 0.0.2
---!     @date    2012/9/23
+--!     @file    sha1_test_bench.vhd
+--!     @brief   SHA-1 TEST BENCH :
+--!     @version 0.1.0
+--!     @date    2012/9/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA1テストベンチのベースモデル.
+--! @brief   SHA-1テストベンチのベースモデル.
 -----------------------------------------------------------------------------------
-entity  TEST_BENCH_1 is
+entity  SHA1_TEST_BENCH is
     generic (
         SYMBOLS     : integer := 4;
         WORDS       : integer := 1;
@@ -49,7 +49,7 @@ entity  TEST_BENCH_1 is
     port (
         FINISH      : out std_logic
     );
-end TEST_BENCH_1;
+end SHA1_TEST_BENCH;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
@@ -60,7 +60,8 @@ library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.INTEGER_TO_STRING;
 use     DUMMY_PLUG.UTIL.HEX_TO_STRING;
 use     DUMMY_PLUG.UTIL.STRING_TO_STD_LOGIC_VECTOR;
-architecture MODEL of TEST_BENCH_1 is
+architecture MODEL of SHA1_TEST_BENCH is
+    constant  HASH_BITS     : integer := 160;
     constant  SYMBOL_BITS   : integer := 8;
     constant  REVERSE       : integer := 1;
     signal    SCENARIO      : STRING(1 to 5);
@@ -75,7 +76,7 @@ architecture MODEL of TEST_BENCH_1 is
     signal    I_LAST        : std_logic;
     signal    I_VAL         : std_logic;
     signal    I_RDY         : std_logic;
-    signal    O_DATA        : std_logic_vector(159 downto 0);
+    signal    O_DATA        : std_logic_vector(HASH_BITS-1 downto 0);
     signal    O_VAL         : std_logic;
     component SHA1 
         generic (
@@ -94,7 +95,7 @@ architecture MODEL of TEST_BENCH_1 is
             I_LAST      : in  std_logic;
             I_VAL       : in  std_logic;
             I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(159 downto 0);
+            O_DATA      : out std_logic_vector(HASH_BITS-1 downto 0);
             O_VAL       : out std_logic
         );
     end component;
@@ -120,11 +121,6 @@ architecture MODEL of TEST_BENCH_1 is
         end loop;
         return ret;
     end function;
-    constant  TEST1 : STRING := string'("abc");
-    constant  TEST2 : STRING := string'("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-    constant  TEST3 : STRING := string'("a");
-    constant  TEST4 : STRING := string'("01234567012345670123456701234567" &
-                                        "01234567012345670123456701234567");
 begin
     -------------------------------------------------------------------------------
     -- 
@@ -266,7 +262,7 @@ begin
         ---------------------------------------------------------------------------
         procedure RUN_TEST_ALL(CNT:integer;MES,EXP:STRING) is
             variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
-            variable  exp_digest : std_logic_vector(159 downto 0);
+            variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
             variable  str_len    : integer;
             variable  run_time   : integer;
         begin
@@ -355,4 +351,119 @@ begin
         wait;
     end process;
 end MODEL;
-
+-----------------------------------------------------------------------------------
+--! @brief   SHA-1テストベンチ(WORDS=1,SYMBOLS=4)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA1_TEST_BENCH_W1_S4 is
+end     SHA1_TEST_BENCH_W1_S4;
+architecture MODEL of SHA1_TEST_BENCH_W1_S4 is
+    component  SHA1_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA1_TEST_BENCH generic map(
+           SYMBOLS      => 4,
+           WORDS        => 1,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--! @brief   SHA-1テストベンチ(WORDS=2,SYMBOLS=8)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA1_TEST_BENCH_W2_S8 is
+end     SHA1_TEST_BENCH_W2_S8;
+architecture MODEL of SHA1_TEST_BENCH_W2_S8 is
+    component  SHA1_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA1_TEST_BENCH generic map(
+           SYMBOLS      => 8,
+           WORDS        => 2,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--! @brief   SHA-1テストベンチ(WORDS=4,SYMBOLS=16)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA1_TEST_BENCH_W4_S16 is
+end     SHA1_TEST_BENCH_W4_S16;
+architecture MODEL of SHA1_TEST_BENCH_W4_S16 is
+    component  SHA1_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA1_TEST_BENCH generic map(
+           SYMBOLS      => 16,
+           WORDS        => 4,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--! @brief   SHA-1テストベンチ(WORDS=1,SYMBOLS=8)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA1_TEST_BENCH_W1_S8 is
+end     SHA1_TEST_BENCH_W1_S8;
+architecture MODEL of SHA1_TEST_BENCH_W1_S8 is
+    component  SHA1_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA1_TEST_BENCH generic map(
+           SYMBOLS      => 8,
+           WORDS        => 1,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;

@@ -2,27 +2,76 @@ GHDL=ghdl
 GHDLFLAGS=--mb-comments
 WORK=work
 
-TEST_BENCH = test_bench_1 \
-             $(END_LIST)
+SHA1_TEST_BENCH   = sha1_test_bench_w1_s4  \
+                    sha1_test_bench_w1_s8  \
+                    sha1_test_bench_w2_s8  \
+                    sha1_test_bench_w4_s16 \
+                    $(END_LIST)
 
-all: $(TEST_BENCH)
+SHA256_TEST_BENCH = sha256_test_bench_w1_s4  \
+                    sha256_test_bench_w1_s8  \
+                    sha256_test_bench_w2_s8  \
+                    sha256_test_bench_w4_s16 \
+                    $(END_LIST)
+
+all: $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH)
 
 clean:
 	rm -f *.o *.cf $(TEST_BENCH)
 
-test_bench_1: test_bench_1.o DUT
+sha1_test_bench_w1_s4     : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-test_bench_1.o   :  ../../src/test/vhdl/test_bench_1.vhd Dummy_Plug PipeWork
+sha1_test_bench_w1_s8     : sha1_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha1_test_bench_w2_s8     : sha1_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha1_test_bench_w4_s16    : sha1_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha256_test_bench_w1_s4   : sha256_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha256_test_bench_w1_s8   : sha256_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha256_test_bench_w2_s8   : sha256_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha256_test_bench_w4_s16  : sha256_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha1_test_bench.o         :  ../../src/test/vhdl/sha1_test_bench.vhd Dummy_Plug PipeWork
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-DUT            : sha_pre_proc.o sha_schedule.o sha1_proc.o sha1.o
+sha256_test_bench.o       :  ../../src/test/vhdl/sha256_test_bench.vhd Dummy_Plug PipeWork
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+
+DUT            : sha_pre_proc.o sha_schedule.o sha1_proc.o sha1.o sha256_proc.o sha256_k_table.o sha256.o
 
 sha1.o         :  ../../src/main/vhdl/sha1.vhd
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 sha1_proc.o    :  ../../src/main/vhdl/sha1_proc.vhd
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+
+sha256.o       :  ../../src/main/vhdl/sha256.vhd
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+
+sha256_proc.o  :  ../../src/main/vhdl/sha256_proc.vhd
+	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+
+sha256_k_table.o:  ../../src/main/vhdl/sha256_k_table.vhd
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 sha_pre_proc.o :  ../../src/main/vhdl/sha_pre_proc.vhd PipeWork

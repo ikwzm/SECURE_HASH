@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
---!     @file    sha1.vhd
---!     @brief   SHA-1 MODULE :
+--!     @file    sha256.vhd
+--!     @brief   SHA-256 MODULE :
 --!     @version 0.2.0
---!     @date    2012/9/26
+--!     @date    2012/9/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1 計算モジュール.
+--! @brief   SHA-256 計算モジュール.
 -----------------------------------------------------------------------------------
-entity  SHA1 is
+entity  SHA256 is
     generic (
         SYMBOL_BITS : --! @brief INPUT SYMBOL BITS :
                       --! 入力データの１シンボルのビット数を指定する.
@@ -86,18 +86,18 @@ entity  SHA1 is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(159 downto 0);
+                      out std_logic_vector(255 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
                       out std_logic
     );
-end SHA1;
+end SHA256;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of SHA1 is
+architecture RTL of SHA256 is
     -------------------------------------------------------------------------------
     -- 内部信号
     -------------------------------------------------------------------------------
@@ -133,9 +133,9 @@ architecture RTL of SHA1 is
         );
     end component;
     -------------------------------------------------------------------------------
-    -- SHA1_PROCのコンポーネント宣言
+    -- SHA256_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
-    component SHA1_PROC
+    component SHA256_PROC
         generic (
             WORDS       : integer := 1
         );
@@ -147,7 +147,7 @@ architecture RTL of SHA1 is
             M_DONE      : in  std_logic;
             M_VAL       : in  std_logic;
             M_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(159 downto 0);
+            O_DATA      : out std_logic_vector(255 downto 0);
             O_VAL       : out std_logic
         );
     end component;
@@ -181,7 +181,7 @@ begin
     -------------------------------------------------------------------------------
     -- Digestの計算.
     -------------------------------------------------------------------------------
-    PROC: SHA1_PROC                      --
+    PROC: SHA256_PROC                    --
         generic map (                    --
             WORDS       => WORDS         -- 
         )                                --
