@@ -144,7 +144,7 @@ begin
             K <= (others => '0');
         elsif (CLK'event and CLK = '1') then
             for i in 0 to WORDS-1 loop
-                K(WORD_BITS*(i+1)-1 downto WORD_BITS*i) <= K_TABLE(T/WORDS+i);
+                K(WORD_BITS*(i+1)-1 downto WORD_BITS*i) <= K_TABLE(WORDS*(T/WORDS)+i);
             end loop;
         end if;
     end process;
