@@ -2,8 +2,8 @@
 --!     @file    sha256_proc.vhd
 --!     @brief   SHA-256 Processing Module :
 --!              SHA-256用計算モジュール.
---!     @version 0.1.0
---!     @date    2012/9/26
+--!     @version 0.2.0
+--!     @date    2012/9/28
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -92,6 +92,10 @@ architecture RTL of SHA256_PROC is
     -------------------------------------------------------------------------------
     constant  WORD_BITS       : integer := 32;
     -------------------------------------------------------------------------------
+    -- ラウンド数
+    -------------------------------------------------------------------------------
+    constant  ROUNDS          : integer := 64;
+    -------------------------------------------------------------------------------
     -- ワードの型宣言
     -------------------------------------------------------------------------------
     subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
@@ -100,7 +104,7 @@ architecture RTL of SHA256_PROC is
     -------------------------------------------------------------------------------
     -- スケジュール用の信号
     -------------------------------------------------------------------------------
-    signal    s_num     : integer range 0 to 63;
+    signal    s_num     : integer range 0 to ROUNDS-1;
     signal    s_done    : std_logic;
     signal    s_last    : std_logic;
     signal    s_input   : std_logic;
@@ -108,7 +112,7 @@ architecture RTL of SHA256_PROC is
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
-    signal    w_num     : integer range 0 to 63;
+    signal    w_num     : integer range 0 to ROUNDS-1;
     signal    w_done    : std_logic;
     signal    w_valid   : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15   );
@@ -155,7 +159,7 @@ architecture RTL of SHA256_PROC is
     -- K[t]
     -------------------------------------------------------------------------------
     signal    k         : WORD_VECTOR(0 to WORDS-1);
-    signal    k_reg     : std_logic_vector(32*WORDS-1 downto 0);
+    signal    k_reg     : std_logic_vector(WORD_BITS*WORDS-1 downto 0);
     -------------------------------------------------------------------------------
     -- ローテート演算関数.
     -------------------------------------------------------------------------------
@@ -268,8 +272,8 @@ architecture RTL of SHA256_PROC is
         port (
             CLK         : in  std_logic; 
             RST         : in  std_logic;
-            T           : in  integer range 0 to 63;
-            K           : out std_logic_vector(32*WORDS-1 downto 0)
+            T           : in  integer range 0 to ROUNDS-1;
+            K           : out std_logic_vector(WORD_BITS*WORDS-1 downto 0)
         );
     end component;
 begin
@@ -281,8 +285,8 @@ begin
             WORD_BITS   => WORD_BITS   , --
             WORDS       => WORDS       , --
             INPUT_NUM   => 16          , --
-            CALC_NUM    => 64          , --
-            END_OF_NUM  => 64            -- 
+            CALC_NUM    => ROUNDS      , --
+            END_OF_NUM  => ROUNDS        -- 
         )
         port map (
             CLK         => CLK         , -- In  :
@@ -350,7 +354,7 @@ begin
             K           => k_reg
         );
     K_GEN: for i in 0 to WORDS-1 generate
-        k(i) <= k_reg(32*(i+1)-1 downto 32*i);
+        k(i) <= k_reg(WORD_BITS*(i+1)-1 downto WORD_BITS*i);
     end generate;
     -------------------------------------------------------------------------------
     -- 
@@ -367,7 +371,7 @@ begin
     -- 
     -------------------------------------------------------------------------------
     CALC: for i in 0 to WORDS-1 generate
-        signal t1,t2 : unsigned(31 downto 0);
+        signal t1,t2 : unsigned(WORD_BITS-1 downto 0);
     begin
         t1 <= unsigned(SigmaA1(e(i))) + unsigned(Ch (e(i),f(i),g(i))) +
               unsigned(h(i)) + unsigned(k(i)) + unsigned(w(i));
@@ -385,14 +389,14 @@ begin
     -- 
     -------------------------------------------------------------------------------
     process (CLK, RST)
-        variable h0_next : std_logic_vector(31 downto 0);
-        variable h1_next : std_logic_vector(31 downto 0);
-        variable h2_next : std_logic_vector(31 downto 0);
-        variable h3_next : std_logic_vector(31 downto 0);
-        variable h4_next : std_logic_vector(31 downto 0);
-        variable h5_next : std_logic_vector(31 downto 0);
-        variable h6_next : std_logic_vector(31 downto 0);
-        variable h7_next : std_logic_vector(31 downto 0);
+        variable h0_next : WORD_TYPE;
+        variable h1_next : WORD_TYPE;
+        variable h2_next : WORD_TYPE;
+        variable h3_next : WORD_TYPE;
+        variable h4_next : WORD_TYPE;
+        variable h5_next : WORD_TYPE;
+        variable h6_next : WORD_TYPE;
+        variable h7_next : WORD_TYPE;
     begin
         if (RST = '1') then
                 h0     <= H0_INIT;
@@ -464,7 +468,7 @@ begin
                     O_VAL  <= '1';
                 else
                     O_VAL  <= '0';
-                    if (w_num < 64-WORDS) then
+                    if (w_num < ROUNDS-WORDS) then
                         a_reg <= a(a'high);
                         b_reg <= b(b'high);
                         c_reg <= c(c'high);

@@ -92,6 +92,10 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     constant  WORD_BITS       : integer := 32;
     -------------------------------------------------------------------------------
+    -- ラウンド数
+    -------------------------------------------------------------------------------
+    constant  ROUNDS          : integer := 80;
+    -------------------------------------------------------------------------------
     -- ワードの型宣言
     -------------------------------------------------------------------------------
     subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
@@ -100,7 +104,7 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- スケジュール用の信号
     -------------------------------------------------------------------------------
-    signal    s_num     : integer range 0 to 79;
+    signal    s_num     : integer range 0 to ROUNDS-1;
     signal    s_done    : std_logic;
     signal    s_last    : std_logic;
     signal    s_input   : std_logic;
@@ -108,7 +112,7 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
-    signal    w_num     : integer range 0 to 79;
+    signal    w_num     : integer range 0 to ROUNDS-1;
     signal    w_done    : std_logic;
     signal    w_valid   : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15   );
@@ -210,8 +214,8 @@ begin
             WORD_BITS   => WORD_BITS   , --
             WORDS       => WORDS       , --
             INPUT_NUM   => 16          , --
-            CALC_NUM    => 80          , --
-            END_OF_NUM  => 80            -- 
+            CALC_NUM    => ROUNDS      , --
+            END_OF_NUM  => ROUNDS        -- 
         )
         port map (
             CLK         => CLK         , -- In  :
@@ -285,11 +289,11 @@ begin
     d(0) <= d_reg;
     e(0) <= e_reg;
     CALC: for i in 0 to WORDS-1 generate
-        signal   a0 : unsigned(31 downto 0);
-        signal   a1 : unsigned(31 downto 0);
-        signal   a2 : unsigned(31 downto 0);
-        signal   a3 : unsigned(31 downto 0);
-        signal   a4 : unsigned(31 downto 0);
+        signal   a0 : unsigned(WORD_BITS-1 downto 0);
+        signal   a1 : unsigned(WORD_BITS-1 downto 0);
+        signal   a2 : unsigned(WORD_BITS-1 downto 0);
+        signal   a3 : unsigned(WORD_BITS-1 downto 0);
+        signal   a4 : unsigned(WORD_BITS-1 downto 0);
     begin 
         a0 <= unsigned(RotL(a(i),5));
         a1 <= unsigned(Ch    (b(i),c(i),d(i))) when ( 0 <= w_num+i and w_num+i < 20) else
@@ -363,7 +367,7 @@ begin
                     O_VAL  <= '1';
                 else
                     O_VAL  <= '0';
-                    if (w_num < 80-WORDS) then
+                    if (w_num < ROUNDS-WORDS) then
                         a_reg <= a(a'high);
                         b_reg <= b(b'high);
                         c_reg <= c(c'high);

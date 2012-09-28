@@ -17,7 +17,7 @@ SHA256_TEST_BENCH = sha256_test_bench_w1_s4  \
 all: $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH)
 
 clean:
-	rm -f *.o *.cf $(TEST_BENCH)
+	rm -f *.o *.cf $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH)
 
 sha1_test_bench_w1_s4     : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
@@ -57,7 +57,9 @@ sha1_test_bench.o         :  ../../src/test/vhdl/sha1_test_bench.vhd Dummy_Plug 
 sha256_test_bench.o       :  ../../src/test/vhdl/sha256_test_bench.vhd Dummy_Plug PipeWork
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-DUT            : sha_pre_proc.o sha_schedule.o sha1_proc.o sha1.o sha256_proc.o sha256_k_table.o sha256.o
+DUT            : sha_pre_proc.o sha_schedule.o sha1_proc.o sha1.o \
+                 sha256_proc.o sha256_k_table.o sha256.o          \
+                 $(END_LIST)
 
 sha1.o         :  ../../src/main/vhdl/sha1.vhd
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
