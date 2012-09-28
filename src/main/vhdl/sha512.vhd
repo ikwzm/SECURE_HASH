@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------
---!     @file    sha256.vhd
---!     @brief   SHA-256 MODULE :
+--!     @file    sha512.vhd
+--!     @brief   SHA-512 MODULE :
 --!     @version 0.3.0
 --!     @date    2012/9/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
@@ -37,9 +37,9 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA-256 計算モジュール.
+--! @brief   SHA-512 計算モジュール.
 -----------------------------------------------------------------------------------
-entity  SHA256 is
+entity  SHA512 is
     generic (
         SYMBOL_BITS : --! @brief INPUT SYMBOL BITS :
                       --! 入力データの１シンボルのビット数を指定する.
@@ -86,22 +86,22 @@ entity  SHA256 is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(255 downto 0);
+                      out std_logic_vector(511 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
                       out std_logic
     );
-end SHA256;
+end SHA512;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of SHA256 is
+architecture RTL of SHA512 is
     -------------------------------------------------------------------------------
     -- 各種定数
     -------------------------------------------------------------------------------
-    constant  WORD_BITS : integer := 32;
+    constant  WORD_BITS : integer := 64;
     -------------------------------------------------------------------------------
     -- 内部信号
     -------------------------------------------------------------------------------
@@ -137,9 +137,9 @@ architecture RTL of SHA256 is
         );
     end component;
     -------------------------------------------------------------------------------
-    -- SHA256_PROCのコンポーネント宣言
+    -- SHA512_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
-    component SHA256_PROC
+    component SHA512_PROC
         generic (
             WORDS       : integer := 1
         );
@@ -151,7 +151,7 @@ architecture RTL of SHA256 is
             M_DONE      : in  std_logic;
             M_VAL       : in  std_logic;
             M_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(255 downto 0);
+            O_DATA      : out std_logic_vector(511 downto 0);
             O_VAL       : out std_logic
         );
     end component;
@@ -185,7 +185,7 @@ begin
     -------------------------------------------------------------------------------
     -- Digestの計算.
     -------------------------------------------------------------------------------
-    PROC: SHA256_PROC                    --
+    PROC: SHA512_PROC                    --
         generic map (                    --
             WORDS       => WORDS         -- 
         )                                --

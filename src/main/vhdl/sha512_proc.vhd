@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
---!     @file    sha256_proc.vhd
---!     @brief   SHA-256 Processing Module :
---!              SHA-256用計算モジュール.
+--!     @file    sha512_proc.vhd
+--!     @brief   SHA-512 Processing Module :
+--!              SHA-512用計算モジュール.
 --!     @version 0.3.0
 --!     @date    2012/9/29
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
@@ -38,13 +38,13 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA256_PROC :
+--! @brief   SHA512_PROC :
 --!          SHA-1用計算モジュール.
 -----------------------------------------------------------------------------------
-entity  SHA256_PROC is
+entity  SHA512_PROC is
     generic (
         WORDS       : --! @brief OUTPUT WORD SIZE :
-                      --! 出力側のワード数を指定する(1ワードは32bit).
+                      --! 出力側のワード数を指定する(1ワードは64bit).
                       integer := 1
     );
     port (
@@ -64,7 +64,7 @@ entity  SHA256_PROC is
     -- 入力側 I/F
     -------------------------------------------------------------------------------
         M_DATA      : --! @brief INPUT MESSAGE DATA :
-                      in  std_logic_vector(32*WORDS-1 downto 0);
+                      in  std_logic_vector(64*WORDS-1 downto 0);
         M_DONE      : --! @brief INPUT MESSAGE DONE :
                       in  std_logic;
         M_VAL       : --! @brief INPUT MESSAGE VALID :
@@ -75,26 +75,26 @@ entity  SHA256_PROC is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(255 downto 0);
+                      out std_logic_vector(511 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
                       out std_logic
     );
-end SHA256_PROC;
+end SHA512_PROC;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-architecture RTL of SHA256_PROC is
+architecture RTL of SHA512_PROC is
     -------------------------------------------------------------------------------
     -- ラウンド数
     -------------------------------------------------------------------------------
-    constant  ROUNDS    : integer := 64;
+    constant  ROUNDS    : integer := 80;
     -------------------------------------------------------------------------------
     -- １ワードのビット数
     -------------------------------------------------------------------------------
-    constant  WORD_BITS : integer := 32;
+    constant  WORD_BITS : integer := 64;
     -------------------------------------------------------------------------------
     -- ワードの型宣言
     -------------------------------------------------------------------------------
@@ -104,18 +104,18 @@ architecture RTL of SHA256_PROC is
     -------------------------------------------------------------------------------
     -- ハッシュレジスタの初期値
     -------------------------------------------------------------------------------
-    constant  H0_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"6A09E667"));
-    constant  H1_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"BB67AE85"));
-    constant  H2_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"3C6EF372"));
-    constant  H3_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"A54FF53A"));
-    constant  H4_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"510E527F"));
-    constant  H5_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"9B05688C"));
-    constant  H6_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"1F83D9AB"));
-    constant  H7_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"5BE0CD19"));
+    constant  H0_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"6a09e667f3bcc908"));
+    constant  H1_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"bb67ae8584caa73b"));
+    constant  H2_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"3c6ef372fe94f82b"));
+    constant  H3_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"a54ff53a5f1d36f1"));
+    constant  H4_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"510e527fade682d1"));
+    constant  H5_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"9b05688c2b3e6c1f"));
+    constant  H6_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"1f83d9abfb41bd6b"));
+    constant  H7_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"5be0cd19137e2179"));
     -------------------------------------------------------------------------------
     -- K-Table のコンポーネント宣言
     -------------------------------------------------------------------------------
-    component SHA256_K_TABLE is
+    component SHA512_K_TABLE is
         generic (
             WORDS       : integer := 1
         );
@@ -219,28 +219,28 @@ architecture RTL of SHA256_PROC is
     -------------------------------------------------------------------------------
     function SigmaA0(X:WORD_TYPE) return std_logic_vector is
     begin
-        return RotR(X, 2) xor RotR(X,13) xor RotR(X,22);
+        return RotR(X,28) xor RotR(X,34) xor RotR(X,39);
     end function;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     function SigmaA1(X:WORD_TYPE) return std_logic_vector is
     begin
-        return RotR(X, 6) xor RotR(X,11) xor RotR(X,25);
+        return RotR(X,14) xor RotR(X,18) xor RotR(X,41);
     end function;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     function SigmaB0(X:WORD_TYPE) return std_logic_vector is
     begin
-        return RotR(X,7) xor RotR(X,18) xor SftR(X,3);
+        return RotR(X, 1) xor RotR(X, 8) xor SftR(X, 7);
     end function;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     function SigmaB1(X:WORD_TYPE) return std_logic_vector is
     begin
-        return RotR(X,17) xor RotR(X,19) xor SftR(X,10);
+        return RotR(X,19) xor RotR(X,61) xor SftR(X, 6);
     end function;
     -------------------------------------------------------------------------------
     -- 
@@ -338,7 +338,7 @@ begin
     -------------------------------------------------------------------------------
     -- K[t]の生成
     -------------------------------------------------------------------------------
-    K_TBL: SHA256_K_TABLE generic map (WORDS) port map (
+    K_TBL: SHA512_K_TABLE generic map (WORDS) port map (
             CLK         => CLK, 
             RST         => RST,
             T           => s_num,
