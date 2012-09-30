@@ -2,8 +2,8 @@
 --!     @file    sha512_proc.vhd
 --!     @brief   SHA-512 Processing Module :
 --!              SHA-512用計算モジュール.
---!     @version 0.3.0
---!     @date    2012/9/29
+--!     @version 0.4.0
+--!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -45,6 +45,13 @@ entity  SHA512_PROC is
     generic (
         WORDS       : --! @brief OUTPUT WORD SIZE :
                       --! 出力側のワード数を指定する(1ワードは64bit).
+                      integer := 1;
+        PIPELINE    : --! @brief PIPELINE MODE :
+                      --! パイプラインモードを指定する.
+                      --! * 1: K[t]+W[t]を一度レジスタで叩いてから演算する.
+                      --!   少しだけ動作周波数が上がる可能性がある.  
+                      --!   スループットは変わらないが、レイテンシーが１クロック遅
+                      --!   くなる.
                       integer := 1
     );
     port (
@@ -142,6 +149,13 @@ architecture RTL of SHA512_PROC is
     signal    w_valid   : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15   );
     signal    w         : WORD_VECTOR(0 to WORDS);
+    -------------------------------------------------------------------------------
+    -- W[t]+K[t]
+    -------------------------------------------------------------------------------
+    signal    p_num     : integer range 0 to ROUNDS-1;
+    signal    p_valid   : std_logic;
+    signal    p_done    : std_logic;
+    signal    p         : WORD_VECTOR(0 to WORDS-1);
     -------------------------------------------------------------------------------
     -- a,b,c,d,e,f,g,h
     -------------------------------------------------------------------------------
@@ -348,6 +362,41 @@ begin
         k(i) <= k_data(WORD_BITS*(i+1)-1 downto WORD_BITS*i);
     end generate;
     -------------------------------------------------------------------------------
+    -- K[t]+W[t]の生成
+    -------------------------------------------------------------------------------
+    P_TRUE: if (PIPELINE > 0) generate
+        process (CLK, RST) begin
+            if (RST = '1') then
+                    p_num   <=  0 ;
+                    p_valid <= '0';
+                    p_done  <= '0';
+                    p       <= (others => WORD_NULL);
+            elsif (CLK'event and CLK = '1') then
+                if (CLR = '1') then
+                    p_num   <=  0 ;
+                    p_valid <= '0';
+                    p_done  <= '0';
+                    p       <= (others => WORD_NULL);
+                else
+                    p_num   <= w_num;
+                    p_valid <= w_valid;
+                    p_done  <= w_done;
+                    for i in 0 to WORDS-1 loop
+                        p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
+                    end loop;
+                end if;
+            end if;
+        end process;
+    end generate;
+    P_FALSE: if (PIPELINE = 0) generate
+        p_num   <= w_num;
+        p_valid <= w_valid;
+        p_done  <= w_done;
+        P_GEN: for i in 0 to WORDS-1 generate
+            p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
+        end generate;
+    end generate;
+    -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     a(0) <= a_reg;
@@ -365,7 +414,7 @@ begin
         signal t1,t2 : unsigned(WORD_BITS-1 downto 0);
     begin
         t1 <= unsigned(SigmaA1(e(i))) + unsigned(Ch (e(i),f(i),g(i))) +
-              unsigned(h(i)) + unsigned(k(i)) + unsigned(w(i));
+              unsigned(h(i)) + unsigned(p(i));
         t2 <= unsigned(SigmaA0(a(i))) + unsigned(Maj(a(i),b(i),c(i)));
         a(i+1) <= std_logic_vector(t1+t2);
         b(i+1) <= a(i);
@@ -421,7 +470,7 @@ begin
                 h_reg  <= H7_INIT;
                 O_DATA <= (others => '0');
                 O_VAL  <= '0';
-            elsif (w_valid = '1') then
+            elsif (p_valid = '1') then
                 h_next(0) := std_logic_vector(unsigned(h0) + unsigned(a(a'high)));
                 h_next(1) := std_logic_vector(unsigned(h1) + unsigned(b(b'high)));
                 h_next(2) := std_logic_vector(unsigned(h2) + unsigned(c(c'high)));
@@ -430,7 +479,7 @@ begin
                 h_next(5) := std_logic_vector(unsigned(h5) + unsigned(f(f'high)));
                 h_next(6) := std_logic_vector(unsigned(h6) + unsigned(g(g'high)));
                 h_next(7) := std_logic_vector(unsigned(h7) + unsigned(h(h'high)));
-                if (w_done = '1') then
+                if (p_done = '1') then
                     h0     <= H0_INIT;
                     h1     <= H1_INIT;
                     h2     <= H2_INIT;
@@ -452,7 +501,7 @@ begin
                     O_VAL  <= '1';
                 else
                     O_VAL  <= '0';
-                    if (w_num < ROUNDS-WORDS) then
+                    if (p_num < ROUNDS-WORDS) then
                         a_reg <= a(a'high);
                         b_reg <= b(b'high);
                         c_reg <= c(c'high);

@@ -2,8 +2,8 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.2.0
---!     @date    2012/9/26
+--!     @version 0.4.0
+--!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -45,6 +45,13 @@ entity  SHA1_PROC is
     generic (
         WORDS       : --! @brief OUTPUT WORD SIZE :
                       --! 出力側のワード数を指定する(1ワードは32bit).
+                      integer := 1;
+        PIPELINE    : --! @brief PIPELINE MODE :
+                      --! パイプラインモードを指定する.
+                      --! * 1: K[t]+W[t]を一度レジスタで叩いてから演算する.
+                      --!   少しだけ動作周波数が上がる可能性がある.  
+                      --!   スループットは変わらないが、レイテンシーが１クロック遅
+                      --!   くなる.
                       integer := 1
     );
     port (
@@ -102,6 +109,11 @@ architecture RTL of SHA1_PROC is
     type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
     constant  WORD_NULL       : WORD_TYPE := (others => '0');
     -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    type      NUM_SEL_TYPE   is (NUM_00_19, NUM_20_39, NUM_40_59, NUM_60_79);
+    type      NUM_SEL_VECTOR is array (INTEGER range <>) of NUM_SEL_TYPE;
+    -------------------------------------------------------------------------------
     -- スケジュール用の信号
     -------------------------------------------------------------------------------
     signal    s_num     : integer range 0 to ROUNDS-1;
@@ -113,10 +125,19 @@ architecture RTL of SHA1_PROC is
     -- W[t]
     -------------------------------------------------------------------------------
     signal    w_num     : integer range 0 to ROUNDS-1;
+    signal    w_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
     signal    w_done    : std_logic;
     signal    w_valid   : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15   );
     signal    w         : WORD_VECTOR(0 to WORDS);
+    -------------------------------------------------------------------------------
+    -- W[t]+K[t]
+    -------------------------------------------------------------------------------
+    signal    p_num     : integer range 0 to ROUNDS-1;
+    signal    p_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
+    signal    p_valid   : std_logic;
+    signal    p_done    : std_logic;
+    signal    p         : WORD_VECTOR(0 to WORDS-1);
     -------------------------------------------------------------------------------
     -- a,b,c,d,e
     -------------------------------------------------------------------------------
@@ -237,16 +258,18 @@ begin
         variable w_work : WORD_VECTOR(0 to 15 + WORDS);
     begin
         if (RST = '1') then
-                w_reg   <= (others => WORD_NULL);
-                w_valid <= '0';
-                w_done  <= '0';
-                w_num   <=  0 ;
+                w_reg     <= (others => WORD_NULL);
+                w_valid   <= '0';
+                w_done    <= '0';
+                w_num     <=  0 ;
+                w_num_sel <= (others => NUM_00_19);
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
-                w_reg   <= (others => WORD_NULL);
-                w_valid <= '0';
-                w_done  <= '0';
-                w_num   <=  0 ;
+                w_reg     <= (others => WORD_NULL);
+                w_valid   <= '0';
+                w_done    <= '0';
+                w_num     <=  0 ;
+                w_num_sel <= (others => NUM_00_19);
             else
                 if (s_valid = '1') then
                     w_work(0 to 15) := w_reg(0 to 15);
@@ -265,6 +288,17 @@ begin
                 w_valid <= s_valid;
                 w_done  <= s_done;
                 w_num   <= s_num;
+                for i in 0 to WORDS-1 loop
+                    if    ( 0 <= s_num + i and s_num + i < 20) then
+                        w_num_sel(i) <= NUM_00_19;
+                    elsif (20 <= s_num + i and s_num + i < 40) then
+                        w_num_sel(i) <= NUM_20_39;
+                    elsif (40 <= s_num + i and s_num + i < 60) then
+                        w_num_sel(i) <= NUM_40_59;
+                    else
+                        w_num_sel(i) <= NUM_60_79;
+                    end if;
+                end loop;
             end if;
         end if;
     end process;
@@ -275,10 +309,49 @@ begin
     -- K[t]の生成
     -------------------------------------------------------------------------------
     K_GEN: for i in 0 to WORDS-1 generate
-        k(i) <= K0 when ( 0 <= w_num + i and w_num + i < 20) else
-                K1 when (20 <= w_num + i and w_num + i < 40) else
-                K2 when (40 <= w_num + i and w_num + i < 60) else
+        k(i) <= K0 when (w_num_sel(i) = NUM_00_19) else
+                K1 when (w_num_sel(i) = NUM_20_39) else
+                K2 when (w_num_sel(i) = NUM_40_59) else
                 K3;
+    end generate;
+    -------------------------------------------------------------------------------
+    -- K[t]+W[t]の生成
+    -------------------------------------------------------------------------------
+    P_TRUE: if (PIPELINE > 0) generate
+        process (CLK, RST) begin
+            if (RST = '1') then
+                    p_num     <=  0 ;
+                    p_num_sel <= (others => NUM_00_19);
+                    p_valid   <= '0';
+                    p_done    <= '0';
+                    p         <= (others => WORD_NULL);
+            elsif (CLK'event and CLK = '1') then
+                if (CLR = '1') then
+                    p_num     <=  0 ;
+                    p_num_sel <= (others => NUM_00_19);
+                    p_valid   <= '0';
+                    p_done    <= '0';
+                    p         <= (others => WORD_NULL);
+                else
+                    p_num     <= w_num;
+                    p_num_sel <= w_num_sel;
+                    p_valid   <= w_valid;
+                    p_done    <= w_done;
+                    for i in 0 to WORDS-1 loop
+                        p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
+                    end loop;
+                end if;
+            end if;
+        end process;
+    end generate;
+    P_FALSE: if (PIPELINE = 0) generate
+        p_num     <= w_num;
+        p_num_sel <= w_num_sel;
+        p_valid   <= w_valid;
+        p_done    <= w_done;
+        P_GEN: for i in 0 to WORDS-1 generate
+            p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
+        end generate;
     end generate;
     -------------------------------------------------------------------------------
     -- a,b,c,d,e の計算
@@ -293,17 +366,15 @@ begin
         signal   a1 : unsigned(WORD_BITS-1 downto 0);
         signal   a2 : unsigned(WORD_BITS-1 downto 0);
         signal   a3 : unsigned(WORD_BITS-1 downto 0);
-        signal   a4 : unsigned(WORD_BITS-1 downto 0);
     begin 
         a0 <= unsigned(RotL(a(i),5));
-        a1 <= unsigned(Ch    (b(i),c(i),d(i))) when ( 0 <= w_num+i and w_num+i < 20) else
-              unsigned(Parity(b(i),c(i),d(i))) when (20 <= w_num+i and w_num+i < 40) else
-              unsigned(Maj   (b(i),c(i),d(i))) when (40 <= w_num+i and w_num+i < 60) else
+        a1 <= unsigned(Ch    (b(i),c(i),d(i))) when (p_num_sel(i) = NUM_00_19) else
+              unsigned(Parity(b(i),c(i),d(i))) when (p_num_sel(i) = NUM_20_39) else
+              unsigned(Maj   (b(i),c(i),d(i))) when (p_num_sel(i) = NUM_40_59) else
               unsigned(Parity(b(i),c(i),d(i)));
         a2 <= unsigned(e(i));
-        a3 <= unsigned(w(i));
-        a4 <= unsigned(k(i));
-        a(i+1) <= std_logic_vector(a0+a1+a2+a3+a4);
+        a3 <= unsigned(p(i));
+        a(i+1) <= std_logic_vector(a0+a1+a2+a3);
         b(i+1) <= a(i);
         c(i+1) <= RotL(B(i),30);
         d(i+1) <= c(i);
@@ -346,13 +417,13 @@ begin
                 e_reg  <= H4_INIT;
                 O_DATA <= (others => '0');
                 O_VAL  <= '0';
-            elsif (w_valid = '1') then
+            elsif (p_valid = '1') then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a(WORDS)));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b(WORDS)));
                 h2_next := std_logic_vector(unsigned(h2) + unsigned(c(WORDS)));
                 h3_next := std_logic_vector(unsigned(h3) + unsigned(d(WORDS)));
                 h4_next := std_logic_vector(unsigned(h4) + unsigned(e(WORDS)));
-                if (w_done = '1') then
+                if (p_done = '1') then
                     h0     <= H0_INIT;
                     h1     <= H1_INIT;
                     h2     <= H2_INIT;
@@ -367,7 +438,7 @@ begin
                     O_VAL  <= '1';
                 else
                     O_VAL  <= '0';
-                    if (w_num < ROUNDS-WORDS) then
+                    if (p_num < ROUNDS-WORDS) then
                         a_reg <= a(a'high);
                         b_reg <= b(b'high);
                         c_reg <= c(c'high);

@@ -20,7 +20,13 @@ SHA512_TEST_BENCH = sha512_test_bench_w1_s4  \
                     sha512_test_bench_w4_s16 \
                     $(END_LIST)
 
-all: $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)
+all    : $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)
+
+sha1_test   : $(SHA1_TEST_BENCH)
+
+sha256_test : $(SHA256_TEST_BENCH)
+
+sha512_test : $(SHA512_TEST_BENCH)
 
 clean:
 	rm -f *.o *.cf $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)

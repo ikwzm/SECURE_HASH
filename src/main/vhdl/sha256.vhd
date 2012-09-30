@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256.vhd
 --!     @brief   SHA-256 MODULE :
---!     @version 0.3.0
---!     @date    2012/9/29
+--!     @version 0.4.0
+--!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -141,7 +141,8 @@ architecture RTL of SHA256 is
     -------------------------------------------------------------------------------
     component SHA256_PROC
         generic (
-            WORDS       : integer := 1
+            WORDS       : integer := 1;
+            PIPELINE    : integer := 1
         );
         port (
             CLK         : in  std_logic; 
@@ -187,7 +188,8 @@ begin
     -------------------------------------------------------------------------------
     PROC: SHA256_PROC                    --
         generic map (                    --
-            WORDS       => WORDS         -- 
+            WORDS       => WORDS       , --
+            PIPELINE    => 1             --
         )                                --
         port map (                       --
             CLK         => CLK         , -- In  :
