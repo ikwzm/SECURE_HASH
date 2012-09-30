@@ -2,8 +2,8 @@
 --!     @file    sha_schedule.vhd
 --!     @brief   SHA-1/2 Prepare the Message Schedule Module.
 --!              SHA-1/2 用スケジュールモジュール.
---!     @version 0.2.0
---!     @date    2012/9/26
+--!     @version 0.5.0
+--!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -56,7 +56,7 @@ entity  SHA_SCHEDULE is
         CALC_NUM    : --! @brief CALC END NUMBER :
                       --! SHA-1では80, SHA-2では64
                       integer := 80;
-        END_OF_NUM  : --! @brief END OF NUMBER :
+        END_NUM     : --! @brief END OF NUMBER :
                       --! 最後のスケジューリング番号を指定する.
                       --! SHA-1では80, SHA-2では64
                       integer := 80
@@ -95,7 +95,7 @@ entity  SHA_SCHEDULE is
         O_VAL       : --! @brief OUTPUT MESSAGE VALID :
                       out std_logic;
         O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
-                      out integer range 0 to END_OF_NUM-1
+                      out integer range 0 to END_NUM-1
     );
 end SHA_SCHEDULE;
 -----------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ architecture RTL of SHA_SCHEDULE is
     -------------------------------------------------------------------------------
     -- 各種内部信号.
     -------------------------------------------------------------------------------
-    signal    state_count     : integer range 0 to END_OF_NUM-1;
+    signal    state_count     : integer range 0 to END_NUM-1;
     signal    input_state     : boolean;
     signal    calc_state      : boolean;
     signal    last_state      : boolean;
@@ -140,7 +140,7 @@ begin
     end process;
     input_state <= (state_count <  INPUT_NUM);
     calc_state  <= (state_count >= INPUT_NUM and state_count < CALC_NUM);
-    last_state  <= (state_count  = END_OF_NUM-WORDS);
+    last_state  <= (state_count  = END_NUM-WORDS);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------

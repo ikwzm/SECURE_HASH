@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha512.vhd
 --!     @brief   SHA-512 MODULE :
---!     @version 0.4.0
+--!     @version 0.5.0
 --!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -142,7 +142,8 @@ architecture RTL of SHA512 is
     component SHA512_PROC
         generic (
             WORDS       : integer := 1;
-            PIPELINE    : integer := 1
+            PIPELINE    : integer := 1;
+            TURN_AR     : integer := 0
         );
         port (
             CLK         : in  std_logic; 
@@ -189,7 +190,8 @@ begin
     PROC: SHA512_PROC                    --
         generic map (                    --
             WORDS       => WORDS       , -- 
-            PIPELINE    => 1             --
+            PIPELINE    => 1           , --
+            TURN_AR     => 0             --
         )                                --
         port map (                       --
             CLK         => CLK         , -- In  :

@@ -2,7 +2,7 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.4.0
+--!     @version 0.5.0
 --!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -48,11 +48,17 @@ entity  SHA1_PROC is
                       integer := 1;
         PIPELINE    : --! @brief PIPELINE MODE :
                       --! パイプラインモードを指定する.
-                      --! * 1: K[t]+W[t]を一度レジスタで叩いてから演算する.
+                      --! * PIPELINE=1: K[t]+W[t]を一度レジスタで叩いてから演算する.
                       --!   少しだけ動作周波数が上がる可能性がある.  
                       --!   スループットは変わらないが、レイテンシーが１クロック遅
                       --!   くなる.
-                      integer := 1
+                      integer := 1;
+        TURN_AR     : --! @brief TURN AROUND CYCLE :
+                      --! １ブロック(16word)処理する毎に挿入するターンアラウンド
+                      --! サイクル数を指定する.
+                      --! サイクル数分だけスループットが落ちるが、動作周波数が上がる
+                      --! 可能性がある.
+                      integer := 0
     );
     port (
     -------------------------------------------------------------------------------
@@ -97,17 +103,22 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- １ワードのビット数
     -------------------------------------------------------------------------------
-    constant  WORD_BITS       : integer := 32;
+    constant  WORD_BITS : integer := 32;
     -------------------------------------------------------------------------------
     -- ラウンド数
     -------------------------------------------------------------------------------
-    constant  ROUNDS          : integer := 80;
+    constant  ROUNDS    : integer := 80;
     -------------------------------------------------------------------------------
     -- ワードの型宣言
     -------------------------------------------------------------------------------
     subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
     type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
-    constant  WORD_NULL       : WORD_TYPE := (others => '0');
+    constant  WORD_NULL : WORD_TYPE := (others => '0');
+    -------------------------------------------------------------------------------
+    -- カウンタ(NUM)の最大値
+    -------------------------------------------------------------------------------
+    constant  END_NUM         : integer := ROUNDS + WORDS*TURN_AR;
+    subtype   NUM_TYPE       is integer range 0 to END_NUM-1;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -116,7 +127,7 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- スケジュール用の信号
     -------------------------------------------------------------------------------
-    signal    s_num     : integer range 0 to ROUNDS-1;
+    signal    s_num     : NUM_TYPE;
     signal    s_done    : std_logic;
     signal    s_last    : std_logic;
     signal    s_input   : std_logic;
@@ -124,19 +135,21 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
-    signal    w_num     : integer range 0 to ROUNDS-1;
+    signal    w_num     : NUM_TYPE;
     signal    w_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
     signal    w_done    : std_logic;
+    signal    w_last    : std_logic;
     signal    w_valid   : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15   );
     signal    w         : WORD_VECTOR(0 to WORDS);
     -------------------------------------------------------------------------------
     -- W[t]+K[t]
     -------------------------------------------------------------------------------
-    signal    p_num     : integer range 0 to ROUNDS-1;
+    signal    p_num     : NUM_TYPE;
     signal    p_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
     signal    p_valid   : std_logic;
     signal    p_done    : std_logic;
+    signal    p_last    : std_logic;
     signal    p         : WORD_VECTOR(0 to WORDS-1);
     -------------------------------------------------------------------------------
     -- a,b,c,d,e
@@ -172,6 +185,11 @@ architecture RTL of SHA1_PROC is
     constant  K1        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"6ED9EBA1"));
     constant  K2        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"8F1BBCDC"));
     constant  K3        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"CA62C1D6"));
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    signal    o_done    : std_logic;
+    signal    o_last    : std_logic;
     -------------------------------------------------------------------------------
     -- ローテート演算関数.
     -------------------------------------------------------------------------------
@@ -210,7 +228,7 @@ architecture RTL of SHA1_PROC is
             WORDS       : integer := 1;
             INPUT_NUM   : integer := 16;
             CALC_NUM    : integer := 80;
-            END_OF_NUM  : integer := 80
+            END_NUM     : integer := 80
         );
         port (
             CLK         : in  std_logic; 
@@ -222,7 +240,7 @@ architecture RTL of SHA1_PROC is
             O_INPUT     : out std_logic;
             O_LAST      : out std_logic;
             O_DONE      : out std_logic;
-            O_NUM       : out integer range 0 to END_OF_NUM-1;
+            O_NUM       : out integer range 0 to END_NUM-1;
             O_VAL       : out std_logic
         );
     end component;
@@ -236,7 +254,7 @@ begin
             WORDS       => WORDS       , --
             INPUT_NUM   => 16          , --
             CALC_NUM    => ROUNDS      , --
-            END_OF_NUM  => ROUNDS        -- 
+            END_NUM     => END_NUM       -- 
         )
         port map (
             CLK         => CLK         , -- In  :
@@ -261,6 +279,7 @@ begin
                 w_reg     <= (others => WORD_NULL);
                 w_valid   <= '0';
                 w_done    <= '0';
+                w_last    <= '0';
                 w_num     <=  0 ;
                 w_num_sel <= (others => NUM_00_19);
         elsif (CLK'event and CLK = '1') then
@@ -268,6 +287,7 @@ begin
                 w_reg     <= (others => WORD_NULL);
                 w_valid   <= '0';
                 w_done    <= '0';
+                w_last    <= '0';
                 w_num     <=  0 ;
                 w_num_sel <= (others => NUM_00_19);
             else
@@ -287,6 +307,7 @@ begin
                 end if;
                 w_valid <= s_valid;
                 w_done  <= s_done;
+                w_last  <= s_last;
                 w_num   <= s_num;
                 for i in 0 to WORDS-1 loop
                     if    ( 0 <= s_num + i and s_num + i < 20) then
@@ -324,6 +345,7 @@ begin
                     p_num_sel <= (others => NUM_00_19);
                     p_valid   <= '0';
                     p_done    <= '0';
+                    p_last    <= '0';
                     p         <= (others => WORD_NULL);
             elsif (CLK'event and CLK = '1') then
                 if (CLR = '1') then
@@ -331,12 +353,14 @@ begin
                     p_num_sel <= (others => NUM_00_19);
                     p_valid   <= '0';
                     p_done    <= '0';
+                    p_last    <= '0';
                     p         <= (others => WORD_NULL);
                 else
                     p_num     <= w_num;
                     p_num_sel <= w_num_sel;
                     p_valid   <= w_valid;
                     p_done    <= w_done;
+                    p_last    <= w_last;
                     for i in 0 to WORDS-1 loop
                         p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
                     end loop;
@@ -348,6 +372,7 @@ begin
         p_num     <= w_num;
         p_num_sel <= w_num_sel;
         p_valid   <= w_valid;
+        p_last    <= w_last;
         p_done    <= w_done;
         P_GEN: for i in 0 to WORDS-1 generate
             p(i) <= std_logic_vector(unsigned(k(i))+unsigned(w(i)));
@@ -401,6 +426,8 @@ begin
                 c_reg  <= H2_INIT;
                 d_reg  <= H3_INIT;
                 e_reg  <= H4_INIT;
+                o_done <= '0';
+                o_last <= '0';
                 O_DATA <= (others => '0');
                 O_VAL  <= '0';
         elsif (CLK'event and CLK = '1') then
@@ -415,50 +442,76 @@ begin
                 c_reg  <= H2_INIT;
                 d_reg  <= H3_INIT;
                 e_reg  <= H4_INIT;
+                o_done <= '0';
+                o_last <= '0';
                 O_DATA <= (others => '0');
                 O_VAL  <= '0';
-            elsif (p_valid = '1') then
+            elsif (o_done  = '1') then
+                h0     <= H0_INIT;
+                h1     <= H1_INIT;
+                h2     <= H2_INIT;
+                h3     <= H3_INIT;
+                h4     <= H4_INIT;
+                a_reg  <= H0_INIT;
+                b_reg  <= H1_INIT;
+                c_reg  <= H2_INIT;
+                d_reg  <= H3_INIT;
+                e_reg  <= H4_INIT;
+                O_DATA <= h0 & h1 & h2 & h3 & h4;
+                O_VAL  <= '1';
+                o_done <= '0';
+                o_last <= '0';
+            elsif (p_last = '1' and TURN_AR = 0) then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a(WORDS)));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b(WORDS)));
                 h2_next := std_logic_vector(unsigned(h2) + unsigned(c(WORDS)));
                 h3_next := std_logic_vector(unsigned(h3) + unsigned(d(WORDS)));
                 h4_next := std_logic_vector(unsigned(h4) + unsigned(e(WORDS)));
-                if (p_done = '1') then
-                    h0     <= H0_INIT;
-                    h1     <= H1_INIT;
-                    h2     <= H2_INIT;
-                    h3     <= H3_INIT;
-                    h4     <= H4_INIT;
-                    a_reg  <= H0_INIT;
-                    b_reg  <= H1_INIT;
-                    c_reg  <= H2_INIT;
-                    d_reg  <= H3_INIT;
-                    e_reg  <= H4_INIT;
-                    O_DATA <= h0_next & h1_next & h2_next & h3_next & h4_next;
-                    O_VAL  <= '1';
-                else
-                    O_VAL  <= '0';
-                    if (p_num < ROUNDS-WORDS) then
-                        a_reg <= a(a'high);
-                        b_reg <= b(b'high);
-                        c_reg <= c(c'high);
-                        d_reg <= d(d'high);
-                        e_reg <= e(e'high);
-                    else
-                        a_reg <= h0_next;
-                        b_reg <= h1_next;
-                        c_reg <= h2_next;
-                        d_reg <= h3_next;
-                        e_reg <= h4_next;
-                        h0    <= h0_next;
-                        h1    <= h1_next;
-                        h2    <= h2_next;
-                        h3    <= h3_next;
-                        h4    <= h4_next;
-                    end if;
-                end if;
+                a_reg  <= h0_next;
+                b_reg  <= h1_next;
+                c_reg  <= h2_next;
+                d_reg  <= h3_next;
+                e_reg  <= h4_next;
+                h0     <= h0_next;
+                h1     <= h1_next;
+                h2     <= h2_next;
+                h3     <= h3_next;
+                h4     <= h4_next;
+                O_VAL  <= '0';
+                o_done <= p_done;
+                o_last <= p_last;
+            elsif (o_last = '1' and TURN_AR > 0) then
+                h0_next := std_logic_vector(unsigned(h0) + unsigned(a_reg));
+                h1_next := std_logic_vector(unsigned(h1) + unsigned(b_reg));
+                h2_next := std_logic_vector(unsigned(h2) + unsigned(c_reg));
+                h3_next := std_logic_vector(unsigned(h3) + unsigned(d_reg));
+                h4_next := std_logic_vector(unsigned(h4) + unsigned(e_reg));
+                h0     <= h0_next;
+                h1     <= h1_next;
+                h2     <= h2_next;
+                h3     <= h3_next;
+                h4     <= h4_next;
+                a_reg  <= h0_next;
+                b_reg  <= h1_next;
+                c_reg  <= h2_next;
+                d_reg  <= h3_next;
+                e_reg  <= h4_next;
+                O_VAL  <= '0';
+                o_done <= p_done;
+                o_last <= p_last;
+            elsif (p_valid = '1') then
+                a_reg  <= a(a'high);
+                b_reg  <= b(b'high);
+                c_reg  <= c(c'high);
+                d_reg  <= d(d'high);
+                e_reg  <= e(e'high);
+                O_VAL  <= '0';
+                o_done <= p_done;
+                o_last <= p_last;
             else
-                    O_VAL  <= '0';
+                O_VAL  <= '0';
+                o_done <= p_done;
+                o_last <= p_last;
             end if;
         end if;
     end process;
