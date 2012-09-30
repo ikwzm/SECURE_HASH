@@ -202,6 +202,7 @@ architecture RTL of SHA512_PROC is
     -------------------------------------------------------------------------------
     -- K[t]
     -------------------------------------------------------------------------------
+    signal    k_num     : integer range 0 to ROUNDS-1;
     signal    k         : WORD_VECTOR(0 to WORDS-1);
     signal    k_data    : std_logic_vector(WORD_BITS*WORDS-1 downto 0);
     -------------------------------------------------------------------------------
@@ -373,10 +374,11 @@ begin
     -------------------------------------------------------------------------------
     -- K[t]の生成
     -------------------------------------------------------------------------------
+    k_num <= s_num when (s_num < ROUNDS) else 0;
     K_TBL: SHA512_K_TABLE generic map (WORDS) port map (
             CLK         => CLK, 
             RST         => RST,
-            T           => s_num,
+            T           => k_num,
             K           => k_data
         );
     K_GEN: for i in 0 to WORDS-1 generate
@@ -513,7 +515,7 @@ begin
                 f_reg  <= H5_INIT;
                 g_reg  <= H6_INIT;
                 h_reg  <= H7_INIT;
-                O_DATA <= h(0) & h(1) & h(2) & h(3) & h(4) & h(5) & h(6) & h(7);
+                O_DATA <= h0 & h1 & h2 & h3 & h4 & h5 & h6 & h7;
                 O_VAL  <= '1';
                 o_done <= '0';
                 o_last <= '0';
