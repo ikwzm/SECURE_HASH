@@ -2,8 +2,8 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.5.0
---!     @date    2012/9/30
+--!     @version 0.5.1
+--!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -135,7 +135,6 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
-    signal    w_num     : NUM_TYPE;
     signal    w_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
     signal    w_done    : std_logic;
     signal    w_last    : std_logic;
@@ -145,7 +144,6 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- W[t]+K[t]
     -------------------------------------------------------------------------------
-    signal    p_num     : NUM_TYPE;
     signal    p_num_sel : NUM_SEL_VECTOR(0 to WORDS-1);
     signal    p_valid   : std_logic;
     signal    p_done    : std_logic;
@@ -280,7 +278,6 @@ begin
                 w_valid   <= '0';
                 w_done    <= '0';
                 w_last    <= '0';
-                w_num     <=  0 ;
                 w_num_sel <= (others => NUM_00_19);
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
@@ -288,7 +285,6 @@ begin
                 w_valid   <= '0';
                 w_done    <= '0';
                 w_last    <= '0';
-                w_num     <=  0 ;
                 w_num_sel <= (others => NUM_00_19);
             else
                 if (s_valid = '1') then
@@ -308,7 +304,6 @@ begin
                 w_valid <= s_valid;
                 w_done  <= s_done;
                 w_last  <= s_last;
-                w_num   <= s_num;
                 for i in 0 to WORDS-1 loop
                     if    ( 0 <= s_num + i and s_num + i < 20) then
                         w_num_sel(i) <= NUM_00_19;
@@ -341,7 +336,6 @@ begin
     P_TRUE: if (PIPELINE > 0) generate
         process (CLK, RST) begin
             if (RST = '1') then
-                    p_num     <=  0 ;
                     p_num_sel <= (others => NUM_00_19);
                     p_valid   <= '0';
                     p_done    <= '0';
@@ -349,14 +343,12 @@ begin
                     p         <= (others => WORD_NULL);
             elsif (CLK'event and CLK = '1') then
                 if (CLR = '1') then
-                    p_num     <=  0 ;
                     p_num_sel <= (others => NUM_00_19);
                     p_valid   <= '0';
                     p_done    <= '0';
                     p_last    <= '0';
                     p         <= (others => WORD_NULL);
                 else
-                    p_num     <= w_num;
                     p_num_sel <= w_num_sel;
                     p_valid   <= w_valid;
                     p_done    <= w_done;
@@ -369,7 +361,6 @@ begin
         end process;
     end generate;
     P_FALSE: if (PIPELINE = 0) generate
-        p_num     <= w_num;
         p_num_sel <= w_num_sel;
         p_valid   <= w_valid;
         p_last    <= w_last;
