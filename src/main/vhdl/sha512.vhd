@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha512.vhd
 --!     @brief   SHA-512 MODULE :
---!     @version 0.5.2
+--!     @version 0.6.0
 --!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -94,7 +94,9 @@ entity  SHA512 is
         O_DATA      : --! @brief OUTPUT WORD DATA :
                       out std_logic_vector(511 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
-                      out std_logic
+                      out std_logic;
+        O_RDY       : --! @brief OUTPUT WORD READY :
+                      in  std_logic
     );
 end SHA512;
 -----------------------------------------------------------------------------------
@@ -160,7 +162,8 @@ architecture RTL of SHA512 is
             M_VAL       : in  std_logic;
             M_RDY       : out std_logic;
             O_DATA      : out std_logic_vector(511 downto 0);
-            O_VAL       : out std_logic
+            O_VAL       : out std_logic;
+            O_RDY       : in  std_logic
         );
     end component;
 begin
@@ -208,6 +211,7 @@ begin
             M_VAL       => m_valid     , -- In  :
             M_RDY       => m_ready     , -- Out :
             O_DATA      => O_DATA      , -- Out :
-            O_VAL       => O_VAL         -- Out :
+            O_VAL       => O_VAL       , -- Out :
+            O_RDY       => O_RDY         -- In  :
         );
 end RTL;

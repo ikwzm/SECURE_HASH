@@ -2,7 +2,7 @@
 --!     @file    sha_schedule.vhd
 --!     @brief   SHA-1/2 Prepare the Message Schedule Module.
 --!              SHA-1/2 用スケジュールモジュール.
---!     @version 0.5.0
+--!     @version 0.6.0
 --!     @date    2012/9/30
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -87,15 +87,17 @@ entity  SHA_SCHEDULE is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_INPUT     : --! @brief INPUT MESSAGE PHASE :
-                     out std_logic;
+                      out std_logic;
         O_LAST      : --! @brief LAST WORD OF MESSAGE :
                       out std_logic;
         O_DONE      : --! @brief MESSAGE DONE :
                       out std_logic;
+        O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
+                      out integer range 0 to END_NUM-1;
         O_VAL       : --! @brief OUTPUT MESSAGE VALID :
                       out std_logic;
-        O_NUM       : --! @brief OUTPUT MESSAGE NUMBER :
-                      out integer range 0 to END_NUM-1
+        O_RDY       : --! @brief OUTPUT MESSAGE READY :
+                      in  std_logic
     );
 end SHA_SCHEDULE;
 -----------------------------------------------------------------------------------
@@ -111,19 +113,14 @@ architecture RTL of SHA_SCHEDULE is
     signal    state_count     : integer range 0 to END_NUM-1;
     signal    input_state     : boolean;
     signal    calc_state      : boolean;
+    signal    gap_state       : boolean;
     signal    last_state      : boolean;
-    signal    valid           : std_logic;
-    signal    done            : std_logic;
+    signal    done_pending    : boolean;
 begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    valid <= '1' when (input_state and I_VAL = '1') or
-                      (calc_state) else '0';
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    I_RDY <= '1' when (input_state) else '0';
+    I_RDY <= '1' when (input_state and O_RDY = '1') else '0';
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
@@ -133,36 +130,39 @@ begin
         elsif (CLK'event and CLK = '1') then
             if    (CLR = '1' or last_state) then
                 state_count <= 0;
-            elsif (valid = '1') then
+            elsif (input_state and I_VAL = '1' and O_RDY = '1') or
+                  (calc_state                  and O_RDY = '1') or
+                  (gap_state ) then
                 state_count <= state_count + WORDS;
             end if;
         end if;
     end process;
     input_state <= (state_count <  INPUT_NUM);
     calc_state  <= (state_count >= INPUT_NUM and state_count < CALC_NUM);
+    gap_state   <= (state_count >= CALC_NUM);
     last_state  <= (state_count  = END_NUM-WORDS);
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     process (CLK, RST) begin
         if (RST = '1') then
-                done   <= '0';
+                done_pending <= FALSE;
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
-                done   <= '0';
+                done_pending <= FALSE;
             elsif (input_state and I_VAL = '1' and I_DONE = '1') then
-                done <= '1';
+                done_pending <= TRUE;
             elsif (last_state) then
-                done <= '0';
+                done_pending <= FALSE;
             end if;
         end if;
     end process;
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    O_VAL   <= valid;
+    O_VAL   <= '1' when (input_state and I_VAL = '1') or (calc_state) else '0';
     O_NUM   <= state_count;
     O_INPUT <= '1' when (input_state) else '0';
     O_LAST  <= '1' when (state_count = CALC_NUM-WORDS) else '0';
-    O_DONE  <= '1' when (last_state and done = '1') else '0';
+    O_DONE  <= '1' when (last_state and done_pending) else '0';
 end RTL;

@@ -2,7 +2,7 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.5.2
+--!     @version 0.6.0
 --!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -90,7 +90,9 @@ entity  SHA1_PROC is
         O_DATA      : --! @brief OUTPUT WORD DATA :
                       out std_logic_vector(159 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
-                      out std_logic
+                      out std_logic;
+        O_RDY       : --! @brief OUTPUT WORD READY :
+                      in  std_logic
     );
 end SHA1_PROC;
 -----------------------------------------------------------------------------------
@@ -132,6 +134,7 @@ architecture RTL of SHA1_PROC is
     signal    s_last    : std_logic;
     signal    s_input   : std_logic;
     signal    s_valid   : std_logic;
+    signal    s_ready   : std_logic;
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
@@ -186,8 +189,9 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    signal    o_done    : std_logic;
     signal    o_last    : std_logic;
+    signal    o_done    : std_logic;
+    signal    o_valid   : std_logic;
     -------------------------------------------------------------------------------
     -- ローテート演算関数.
     -------------------------------------------------------------------------------
@@ -239,7 +243,8 @@ architecture RTL of SHA1_PROC is
             O_LAST      : out std_logic;
             O_DONE      : out std_logic;
             O_NUM       : out integer range 0 to END_NUM-1;
-            O_VAL       : out std_logic
+            O_VAL       : out std_logic;
+            O_RDY       : in  std_logic
         );
     end component;
 begin
@@ -265,8 +270,18 @@ begin
             O_INPUT     => s_input     , -- Out :
             O_LAST      => s_last      , -- Out :
             O_DONE      => s_done      , -- Out :
-            O_VAL       => s_valid       -- Out :
+            O_VAL       => s_valid     , -- Out :
+            O_RDY       => s_ready       -- In  :
         );
+    process (CLK, RST) begin
+        if         (RST   = '1') then s_ready <= '1';
+        elsif (CLK'event and CLK = '1') then
+            if    (CLR    = '1') then s_ready <= '1';
+            elsif (o_done = '1') then s_ready <= '1';
+            elsif (s_done = '1') then s_ready <= '0';
+            end if;
+        end if;
+    end process;
     -------------------------------------------------------------------------------
     -- W[t]の生成
     -------------------------------------------------------------------------------
@@ -417,10 +432,6 @@ begin
                 c_reg  <= H2_INIT;
                 d_reg  <= H3_INIT;
                 e_reg  <= H4_INIT;
-                o_done <= '0';
-                o_last <= '0';
-                O_DATA <= (others => '0');
-                O_VAL  <= '0';
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
                 h0     <= H0_INIT;
@@ -433,10 +444,6 @@ begin
                 c_reg  <= H2_INIT;
                 d_reg  <= H3_INIT;
                 e_reg  <= H4_INIT;
-                o_done <= '0';
-                o_last <= '0';
-                O_DATA <= (others => '0');
-                O_VAL  <= '0';
             elsif (o_done  = '1') then
                 h0     <= H0_INIT;
                 h1     <= H1_INIT;
@@ -448,10 +455,6 @@ begin
                 c_reg  <= H2_INIT;
                 d_reg  <= H3_INIT;
                 e_reg  <= H4_INIT;
-                O_DATA <= h0 & h1 & h2 & h3 & h4;
-                O_VAL  <= '1';
-                o_done <= '0';
-                o_last <= '0';
             elsif (p_last = '1' and BLOCK_GAP = 0) then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a(WORDS)));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b(WORDS)));
@@ -468,9 +471,6 @@ begin
                 h2     <= h2_next;
                 h3     <= h3_next;
                 h4     <= h4_next;
-                O_VAL  <= '0';
-                o_done <= p_done;
-                o_last <= p_last;
             elsif (o_last = '1' and BLOCK_GAP > 0) then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a_reg));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b_reg));
@@ -487,23 +487,37 @@ begin
                 c_reg  <= h2_next;
                 d_reg  <= h3_next;
                 e_reg  <= h4_next;
-                O_VAL  <= '0';
-                o_done <= p_done;
-                o_last <= p_last;
             elsif (p_valid = '1') then
                 a_reg  <= a(a'high);
                 b_reg  <= b(b'high);
                 c_reg  <= c(c'high);
                 d_reg  <= d(d'high);
                 e_reg  <= e(e'high);
-                O_VAL  <= '0';
-                o_done <= p_done;
-                o_last <= p_last;
-            else
-                O_VAL  <= '0';
-                o_done <= p_done;
-                o_last <= p_last;
             end if;
         end if;
     end process;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    process (CLK, RST) begin
+        if (RST = '1') then
+                o_last  <= '0';
+                o_valid <= '0';
+        elsif (CLK'event and CLK = '1') then
+            if (CLR = '1') then
+                o_last  <= '0';
+                o_valid <= '0';
+            else
+                o_last <= p_last;
+                if    (o_done = '1') then
+                    o_valid <= '0';
+                elsif (p_done = '1') then
+                    o_valid <= '1';
+                end if;
+            end if;
+        end if;
+    end process;
+    O_DATA <= h0 & h1 & h2 & h3 & h4;
+    O_VAL  <= o_valid;
+    o_done <= '1' when (o_valid = '1' and O_RDY = '1') else '0';
 end RTL;

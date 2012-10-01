@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_test_bench.vhd
 --!     @brief   SHA-1 TEST BENCH :
---!     @version 0.5.2
+--!     @version 0.6.0
 --!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -79,6 +79,7 @@ architecture MODEL of SHA1_TEST_BENCH is
     signal    I_RDY         : std_logic;
     signal    O_DATA        : std_logic_vector(HASH_BITS-1 downto 0);
     signal    O_VAL         : std_logic;
+    signal    O_RDY         : std_logic;
     component SHA1 
         generic (
             SYMBOL_BITS : integer := 8;
@@ -98,7 +99,8 @@ architecture MODEL of SHA1_TEST_BENCH is
             I_VAL       : in  std_logic;
             I_RDY       : out std_logic;
             O_DATA      : out std_logic_vector(HASH_BITS-1 downto 0);
-            O_VAL       : out std_logic
+            O_VAL       : out std_logic;
+            O_RDY       : in  std_logic
         );
     end component;
     subtype   SYMBOL_TYPE      is std_logic_vector(SYMBOL_BITS-1 downto 0);
@@ -154,7 +156,8 @@ begin
             I_VAL       => I_VAL       , -- In :
             I_RDY       => I_RDY       , -- Out:
             O_DATA      => O_DATA      , -- Out:
-            O_VAL       => O_VAL         -- Out:
+            O_VAL       => O_VAL       , -- Out:
+            O_RDY       => O_RDY         -- In :
         );
     -------------------------------------------------------------------------------
     --
@@ -247,12 +250,14 @@ begin
         ---------------------------------------------------------------------------
         procedure RUN_TEST(MES:SYMBOL_VECTOR;CNT,OFF:integer;LAST,DONE:boolean;EXP:std_logic_vector) is
             variable  run_time   : integer;
-        begin 
+        begin
             TIME_COUNT_RESET <= '1', '0' after 1 ns;
             assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Start" severity NOTE;
+            O_RDY <= '1';
             INPUT_SYMBOL(MES, CNT, OFF, LAST, DONE);
             assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Wait"  severity NOTE;
             wait until (CLK'event and CLK = '1' and O_VAL = '1');
+            O_RDY <= '0';
             assert (O_DATA = EXP)
                 report MESSAGE_TAG & "Mismatch " & SCENARIO &
                        " O_DATA="   & HEX_TO_STRING(O_DATA) &
@@ -302,6 +307,7 @@ begin
                        I_DONE   <= '0';
                        I_DATA   <= (others => '0');
                        I_ENA    <= (others => '0');
+                       O_RDY    <= '0';
         WAIT_CLK( 4);  RST      <= '0';
                        CLR      <= '0';
         WAIT_CLK( 4);
