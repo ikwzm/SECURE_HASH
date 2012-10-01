@@ -2,7 +2,7 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.5.1
+--!     @version 0.5.2
 --!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -53,11 +53,11 @@ entity  SHA1_PROC is
                       --!   スループットは変わらないが、レイテンシーが１クロック遅
                       --!   くなる.
                       integer := 1;
-        TURN_AR     : --! @brief TURN AROUND CYCLE :
-                      --! １ブロック(16word)処理する毎に挿入するターンアラウンド
-                      --! サイクル数を指定する.
-                      --! サイクル数分だけスループットが落ちるが、動作周波数が上がる
-                      --! 可能性がある.
+        BLOCK_GAP   : --! @brief BLOCK GAP CYCLE :
+                      --! １ブロック(16word)処理する毎に挿入するギャップのサイクル
+                      --! 数を指定する.
+                      --! サイクル数分だけスループットが落ちるが、動作周波数が上が
+                      --! る可能性がある.
                       integer := 0
     );
     port (
@@ -117,7 +117,7 @@ architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値
     -------------------------------------------------------------------------------
-    constant  END_NUM         : integer := ROUNDS + WORDS*TURN_AR;
+    constant  END_NUM         : integer := ROUNDS + WORDS*BLOCK_GAP;
     subtype   NUM_TYPE       is integer range 0 to END_NUM-1;
     -------------------------------------------------------------------------------
     -- 
@@ -452,7 +452,7 @@ begin
                 O_VAL  <= '1';
                 o_done <= '0';
                 o_last <= '0';
-            elsif (p_last = '1' and TURN_AR = 0) then
+            elsif (p_last = '1' and BLOCK_GAP = 0) then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a(WORDS)));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b(WORDS)));
                 h2_next := std_logic_vector(unsigned(h2) + unsigned(c(WORDS)));
@@ -471,7 +471,7 @@ begin
                 O_VAL  <= '0';
                 o_done <= p_done;
                 o_last <= p_last;
-            elsif (o_last = '1' and TURN_AR > 0) then
+            elsif (o_last = '1' and BLOCK_GAP > 0) then
                 h0_next := std_logic_vector(unsigned(h0) + unsigned(a_reg));
                 h1_next := std_logic_vector(unsigned(h1) + unsigned(b_reg));
                 h2_next := std_logic_vector(unsigned(h2) + unsigned(c_reg));

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256_test_bench.vhd
 --!     @brief   SHA-256 TEST BENCH :
---!     @version 0.1.0
---!     @date    2012/9/27
+--!     @version 0.5.2
+--!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -43,6 +43,7 @@ entity  SHA256_TEST_BENCH is
     generic (
         SYMBOLS     : integer := 4;
         WORDS       : integer := 1;
+        BLOCK_GAP   : integer := 1;
         VERBOSE     : integer := 1;
         AUTO_FINISH : integer := 1
     );
@@ -83,7 +84,8 @@ architecture MODEL of SHA256_TEST_BENCH is
             SYMBOL_BITS : integer := 8;
             SYMBOLS     : integer := 4;
             REVERSE     : integer := 1;
-            WORDS       : integer := 1
+            WORDS       : integer := 1;
+            BLOCK_GAP   : integer := 1
         );
         port (
             CLK         : in  std_logic; 
@@ -110,6 +112,7 @@ architecture MODEL of SHA256_TEST_BENCH is
         return "(SYMBOL_BITS="  & INTEGER_TO_STRING(SYMBOL_BITS ) &
                ",SYMBOLS="      & INTEGER_TO_STRING(SYMBOLS     ) &
                ",WORDS="        & INTEGER_TO_STRING(WORDS       ) &
+               ",BLOCK_GAP="    & INTEGER_TO_STRING(BLOCK_GAP   ) &
                "):";
     end function;
     function  STRING_TO_SYMBOL_VECTOR(STR:STRING) return SYMBOL_VECTOR is
@@ -134,10 +137,11 @@ begin
     -------------------------------------------------------------------------------
     DUT: SHA256 
         generic map (
-            SYMBOL_BITS => SYMBOL_BITS,
-            SYMBOLS     => SYMBOLS,
-            REVERSE     => REVERSE,
-            WORDS       => WORDS
+            SYMBOL_BITS => SYMBOL_BITS ,
+            SYMBOLS     => SYMBOLS     ,
+            REVERSE     => REVERSE     ,
+            WORDS       => WORDS       ,
+            BLOCK_GAP   => BLOCK_GAP   
         )
         port map (
             CLK         => CLK         , -- In :
@@ -352,17 +356,18 @@ begin
     end process;
 end MODEL;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1テストベンチ(WORDS=1,SYMBOLS=4)
+--! @brief   SHA-256テストベンチ(WORDS=1,SYMBOLS=4,BLOCK_GAP=0)
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-entity  SHA256_TEST_BENCH_W1_S4 is
-end     SHA256_TEST_BENCH_W1_S4;
-architecture MODEL of SHA256_TEST_BENCH_W1_S4 is
+entity  SHA256_TEST_BENCH_W1_S4_G0 is
+end     SHA256_TEST_BENCH_W1_S4_G0;
+architecture MODEL of SHA256_TEST_BENCH_W1_S4_G0 is
     component  SHA256_TEST_BENCH
         generic (
             SYMBOLS     : integer;
             WORDS       : integer;
+            BLOCK_GAP   : integer;
             VERBOSE     : integer;
             AUTO_FINISH : integer
         );
@@ -374,6 +379,7 @@ begin
     TB: SHA256_TEST_BENCH generic map(
            SYMBOLS      => 4,
            WORDS        => 1,
+           BLOCK_GAP    => 0,
            VERBOSE      => 0,
            AUTO_FINISH  => 1
     ) port map (
@@ -381,17 +387,49 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1テストベンチ(WORDS=2,SYMBOLS=8)
+--! @brief   SHA-256テストベンチ(WORDS=1,SYMBOLS=4,BLOCK_GAP=1)
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-entity  SHA256_TEST_BENCH_W2_S8 is
-end     SHA256_TEST_BENCH_W2_S8;
-architecture MODEL of SHA256_TEST_BENCH_W2_S8 is
+entity  SHA256_TEST_BENCH_W1_S4_G1 is
+end     SHA256_TEST_BENCH_W1_S4_G1;
+architecture MODEL of SHA256_TEST_BENCH_W1_S4_G1 is
     component  SHA256_TEST_BENCH
         generic (
             SYMBOLS     : integer;
             WORDS       : integer;
+            BLOCK_GAP   : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA256_TEST_BENCH generic map(
+           SYMBOLS      => 4,
+           WORDS        => 1,
+           BLOCK_GAP    => 1,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--! @brief   SHA-256テストベンチ(WORDS=2,SYMBOLS=8,BLOCK_GAP=0)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA256_TEST_BENCH_W2_S8_G0 is
+end     SHA256_TEST_BENCH_W2_S8_G0;
+architecture MODEL of SHA256_TEST_BENCH_W2_S8_G0 is
+    component  SHA256_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            BLOCK_GAP   : integer;
             VERBOSE     : integer;
             AUTO_FINISH : integer
         );
@@ -403,6 +441,7 @@ begin
     TB: SHA256_TEST_BENCH generic map(
            SYMBOLS      => 8,
            WORDS        => 2,
+           BLOCK_GAP    => 0,
            VERBOSE      => 0,
            AUTO_FINISH  => 1
     ) port map (
@@ -410,17 +449,18 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1テストベンチ(WORDS=4,SYMBOLS=16)
+--! @brief   SHA-256テストベンチ(WORDS=4,SYMBOLS=16,BLOCK_GAP=0)
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-entity  SHA256_TEST_BENCH_W4_S16 is
-end     SHA256_TEST_BENCH_W4_S16;
-architecture MODEL of SHA256_TEST_BENCH_W4_S16 is
+entity  SHA256_TEST_BENCH_W4_S16_G0 is
+end     SHA256_TEST_BENCH_W4_S16_G0;
+architecture MODEL of SHA256_TEST_BENCH_W4_S16_G0 is
     component  SHA256_TEST_BENCH
         generic (
             SYMBOLS     : integer;
             WORDS       : integer;
+            BLOCK_GAP   : integer;
             VERBOSE     : integer;
             AUTO_FINISH : integer
         );
@@ -432,6 +472,7 @@ begin
     TB: SHA256_TEST_BENCH generic map(
            SYMBOLS      => 16,
            WORDS        => 4,
+           BLOCK_GAP    => 0,
            VERBOSE      => 0,
            AUTO_FINISH  => 1
     ) port map (
@@ -439,17 +480,18 @@ begin
     );
 end MODEL;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1テストベンチ(WORDS=1,SYMBOLS=8)
+--! @brief   SHA-256テストベンチ(WORDS=1,SYMBOLS=8,BLOCK_GAP=0)
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-entity  SHA256_TEST_BENCH_W1_S8 is
-end     SHA256_TEST_BENCH_W1_S8;
-architecture MODEL of SHA256_TEST_BENCH_W1_S8 is
+entity  SHA256_TEST_BENCH_W1_S8_G0 is
+end     SHA256_TEST_BENCH_W1_S8_G0;
+architecture MODEL of SHA256_TEST_BENCH_W1_S8_G0 is
     component  SHA256_TEST_BENCH
         generic (
             SYMBOLS     : integer;
             WORDS       : integer;
+            BLOCK_GAP   : integer;
             VERBOSE     : integer;
             AUTO_FINISH : integer
         );
@@ -461,6 +503,7 @@ begin
     TB: SHA256_TEST_BENCH generic map(
            SYMBOLS      => 8,
            WORDS        => 1,
+           BLOCK_GAP    => 0,
            VERBOSE      => 0,
            AUTO_FINISH  => 1
     ) port map (

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256.vhd
 --!     @brief   SHA-256 MODULE :
---!     @version 0.5.0
---!     @date    2012/9/30
+--!     @version 0.5.2
+--!     @date    2012/10/1
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -52,6 +52,12 @@ entity  SHA256 is
                       integer := 1;
         WORDS       : --! @brief WORD SIZE :
                       --! 一度に処理するワード数を指定する.
+                      integer := 1;
+        BLOCK_GAP   : --! @brief BLOCK GAP CYCLE :
+                      --! １ブロック(16word)処理する毎に挿入するギャップのサイクル
+                      --! 数を指定する.
+                      --! サイクル数分だけスループットが落ちるが、動作周波数が上が
+                      --! る可能性がある.
                       integer := 1
     );
     port (
@@ -143,7 +149,7 @@ architecture RTL of SHA256 is
         generic (
             WORDS       : integer := 1;
             PIPELINE    : integer := 1;
-            TURN_AR     : integer := 0
+            BLOCK_GAP   : integer := 0
         );
         port (
             CLK         : in  std_logic; 
@@ -191,7 +197,7 @@ begin
         generic map (                    --
             WORDS       => WORDS       , --
             PIPELINE    => 1           , --
-            TURN_AR     => 0             --
+            BLOCK_GAP   => BLOCK_GAP     --
         )                                --
         port map (                       --
             CLK         => CLK         , -- In  :

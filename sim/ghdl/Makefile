@@ -2,22 +2,26 @@ GHDL=ghdl
 GHDLFLAGS=--mb-comments
 WORK=work
 
-SHA1_TEST_BENCH   = sha1_test_bench_w1_s4  \
-                    sha1_test_bench_w1_s8  \
-                    sha1_test_bench_w2_s8  \
-                    sha1_test_bench_w4_s16 \
+SHA1_TEST_BENCH   = sha1_test_bench_w1_s4_g0    \
+                    sha1_test_bench_w1_s4_g1    \
+                    sha1_test_bench_w1_s8_g0    \
+                    sha1_test_bench_w2_s8_g0    \
+                    sha1_test_bench_w4_s16_g0   \
                     $(END_LIST)
 
-SHA256_TEST_BENCH = sha256_test_bench_w1_s4  \
-                    sha256_test_bench_w1_s8  \
-                    sha256_test_bench_w2_s8  \
-                    sha256_test_bench_w4_s16 \
+SHA256_TEST_BENCH = sha256_test_bench_w1_s4_g0  \
+                    sha256_test_bench_w1_s4_g1  \
+                    sha256_test_bench_w1_s8_g0  \
+                    sha256_test_bench_w2_s8_g0  \
+                    sha256_test_bench_w4_s16_g0 \
                     $(END_LIST)
 
-SHA512_TEST_BENCH = sha512_test_bench_w1_s4  \
-                    sha512_test_bench_w1_s8  \
-                    sha512_test_bench_w2_s8  \
-                    sha512_test_bench_w4_s16 \
+SHA512_TEST_BENCH = sha512_test_bench_w1_s4_g0  \
+                    sha512_test_bench_w1_s4_g1  \
+                    sha512_test_bench_w1_s8_g0  \
+                    sha512_test_bench_w1_s8_g1  \
+                    sha512_test_bench_w2_s8_g0  \
+                    sha512_test_bench_w4_s16_g0 \
                     $(END_LIST)
 
 all    : $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)
@@ -31,51 +35,67 @@ sha512_test : $(SHA512_TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)
 
-sha1_test_bench_w1_s4     : sha1_test_bench.o DUT
+sha1_test_bench_w1_s4_g0    : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_test_bench_w1_s8     : sha1_test_bench.o DUT
+sha1_test_bench_w1_s4_g1    : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_test_bench_w2_s8     : sha1_test_bench.o DUT
+sha1_test_bench_w1_s8_g0    : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_test_bench_w4_s16    : sha1_test_bench.o DUT
+sha1_test_bench_w2_s8_g0    : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_test_bench_w1_s4   : sha256_test_bench.o DUT
+sha1_test_bench_w4_s16_g0   : sha1_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_test_bench_w1_s8   : sha256_test_bench.o DUT
+sha256_test_bench_w1_s4_g0  : sha256_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_test_bench_w2_s8   : sha256_test_bench.o DUT
+sha256_test_bench_w1_s4_g1  : sha256_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_test_bench_w4_s16  : sha256_test_bench.o DUT
+sha256_test_bench_w1_s8_g0  : sha256_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_test_bench_w1_s4   : sha512_test_bench.o DUT
+sha256_test_bench_w2_s8_g0  : sha256_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_test_bench_w1_s8   : sha512_test_bench.o DUT
+sha256_test_bench_w4_s16_g0 : sha256_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_test_bench_w2_s8   : sha512_test_bench.o DUT
+sha512_test_bench_w1_s4_g0  : sha512_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_test_bench_w4_s16  : sha512_test_bench.o DUT
+sha512_test_bench_w1_s4_g1  : sha512_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha512_test_bench_w1_s8_g0  : sha512_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha512_test_bench_w1_s8_g1  : sha512_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha512_test_bench_w2_s8_g0  : sha512_test_bench.o DUT
+	 $(GHDL) -e $(GHDLFLAGS) $@
+	-$(GHDL) -r $(GHDLRUNFLAGS) $@
+
+sha512_test_bench_w4_s16_g0 : sha512_test_bench.o DUT
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
