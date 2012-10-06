@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha512_test_bench.vhd
 --!     @brief   SHA-512 TEST BENCH :
---!     @version 0.6.0
---!     @date    2012/10/1
+--!     @version 0.7.0
+--!     @date    2012/10/6
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -61,8 +61,10 @@ library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.INTEGER_TO_STRING;
 use     DUMMY_PLUG.UTIL.HEX_TO_STRING;
 use     DUMMY_PLUG.UTIL.STRING_TO_STD_LOGIC_VECTOR;
+library PipeWork;
+use     PipeWork.SHA512.SHA512_CORE;
+use     PipeWork.SHA512.HASH_BITS;
 architecture MODEL of SHA512_TEST_BENCH is
-    constant  HASH_BITS     : integer := 512;
     constant  SYMBOL_BITS   : integer := 8;
     constant  REVERSE       : integer := 1;
     signal    SCENARIO      : STRING(1 to 5);
@@ -80,29 +82,6 @@ architecture MODEL of SHA512_TEST_BENCH is
     signal    O_DATA        : std_logic_vector(HASH_BITS-1 downto 0);
     signal    O_VAL         : std_logic;
     signal    O_RDY         : std_logic;
-    component SHA512 
-        generic (
-            SYMBOL_BITS : integer := 8;
-            SYMBOLS     : integer := 4;
-            REVERSE     : integer := 1;
-            WORDS       : integer := 1;
-            BLOCK_GAP   : integer := 1
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            I_DATA      : in  std_logic_vector(SYMBOL_BITS*SYMBOLS-1 downto 0);
-            I_ENA       : in  std_logic_vector(            SYMBOLS-1 downto 0);
-            I_DONE      : in  std_logic;
-            I_LAST      : in  std_logic;
-            I_VAL       : in  std_logic;
-            I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(HASH_BITS-1 downto 0);
-            O_VAL       : out std_logic;
-            O_RDY       : in  std_logic
-        );
-    end component;
     subtype   SYMBOL_TYPE      is std_logic_vector(SYMBOL_BITS-1 downto 0);
     type      SYMBOL_VECTOR    is array (INTEGER range <>) of SYMBOL_TYPE;
     constant  SYMBOL_NULL      : SYMBOL_TYPE := (others => '0');
@@ -137,7 +116,7 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    DUT: SHA512 
+    DUT: SHA512_CORE
         generic map (
             SYMBOL_BITS => SYMBOL_BITS ,
             SYMBOLS     => SYMBOLS     ,
@@ -188,9 +167,14 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        procedure INPUT_SYMBOL(VEC:SYMBOL_VECTOR;CNT,OFF:integer;LAST,DONE:boolean) is
+        type      CYCLE_VECTOR is array (INTEGER range <>) of INTEGER;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        procedure INPUT_SYMBOL(VEC:SYMBOL_VECTOR;WC:CYCLE_VECTOR;CNT,OFF:integer;LAST,DONE:boolean) is
             variable i_pos : integer;
             variable v_pos : integer;
+            variable w_pos : integer;
             variable count : integer;
         begin
             I_VAL  <= '0'             after DELAY;
@@ -200,14 +184,27 @@ begin
             I_DATA <= (others => '0') after DELAY;
             i_pos := OFF;
             v_pos := VEC'low;
+            w_pos := WC'low;
             count := 0;
             assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO &
                 " VEC'length=" & INTEGER_TO_STRING(VEC'length) &
                 " CNT="        & INTEGER_TO_STRING(CNT)        &
                 " OFF="        & INTEGER_TO_STRING(OFF)        severity NOTE;
             MAIN_LOOP: loop
-             -- assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " VPOS="  & INTEGER_TO_STRING(v_pos) severity NOTE;
-             -- assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " COUNT=" & INTEGER_TO_STRING(count) severity NOTE;
+            -- assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO &
+            --     " VPOS="  & INTEGER_TO_STRING(v_pos) severity NOTE;
+            -- assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO &
+            --     " COUNT=" & INTEGER_TO_STRING(count) severity NOTE;
+                if (WC(w_pos) > 0) then
+                    for i in 1 to WC(w_pos) loop
+                        wait until (CLK'event and CLK = '1');
+                    end loop;
+                end if;
+                if (w_pos >= WC'high) then
+                    w_pos := WC'low;
+                else
+                    w_pos := w_pos + 1;
+                end if;
                 for i in I_ENA'low to I_ENA'high loop
                     if (i >= i_pos and v_pos <= VEC'high) then
                         I_ENA(i) <= '1' after DELAY;
@@ -248,13 +245,13 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        procedure RUN_TEST(MES:SYMBOL_VECTOR;CNT,OFF:integer;LAST,DONE:boolean;EXP:std_logic_vector) is
+        procedure RUN_TEST(MES:SYMBOL_VECTOR;WC:CYCLE_VECTOR;CNT,OFF:integer;LAST,DONE:boolean;EXP:std_logic_vector) is
             variable  run_time   : integer;
         begin 
             TIME_COUNT_RESET <= '1', '0' after 1 ns;
             assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Start" severity NOTE;
             O_RDY <= '1';
-            INPUT_SYMBOL(MES, CNT, OFF, LAST, DONE);
+            INPUT_SYMBOL(MES, WC, CNT, OFF, LAST, DONE);
             assert(VERBOSE=0) report MESSAGE_TAG & " " & SCENARIO & " Wait"  severity NOTE;
             wait until (CLK'event and CLK = '1' and O_VAL = '1');
             O_RDY <= '0';
@@ -269,11 +266,12 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        procedure RUN_TEST_ALL(CNT:integer;MES,EXP:STRING) is
+        procedure RUN_TEST_OFFSET(CNT:integer;MES,EXP:STRING) is
             variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
             variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
             variable  str_len    : integer;
             variable  run_time   : integer;
+            variable  wait_cycle : CYCLE_VECTOR(0 to 15) := (others => 0);
         begin
             message := STRING_TO_SYMBOL_VECTOR(MES);
             STRING_TO_STD_LOGIC_VECTOR(
@@ -285,13 +283,87 @@ begin
             for offset in 0 to SYMBOLS-1 loop
                 SCENARIO(5) <= INTEGER_TO_CHAR(offset+1);
                 wait for 0 ns;
-                RUN_TEST(message, CNT, offset, TRUE, FALSE, exp_digest);
+                RUN_TEST(message, wait_cycle, CNT, offset, TRUE, FALSE, exp_digest);
             end loop;
             SCENARIO(3) <= INTEGER_TO_CHAR(3);
             for offset in 0 to SYMBOLS-1 loop
                 SCENARIO(5) <= INTEGER_TO_CHAR(offset+1);
                 wait for 0 ns;
-                RUN_TEST(message, CNT, offset, FALSE, TRUE, exp_digest);
+                RUN_TEST(message, wait_cycle, CNT, offset, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(4);
+        end procedure;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
+        procedure RUN_TEST_TIMING(CNT:integer;MES,EXP:STRING) is
+            variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
+            variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
+            variable  str_len    : integer;
+            variable  run_time   : integer;
+            variable  wait_cycle : CYCLE_VECTOR(0 to 15) := (others => 0);
+        begin
+            message := STRING_TO_SYMBOL_VECTOR(MES);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => EXP, 
+                VAL     => exp_digest,
+                STR_LEN => str_len
+            );
+            SCENARIO(3) <= INTEGER_TO_CHAR(2);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (0 => 0, others => wc);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(3);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (2 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(4);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (3 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(5);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (4 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(6);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (0 => 20, others => wc);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(7);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (0 => 20, 2 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(8);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (0 => 20, 3 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
+            end loop;
+            SCENARIO(3) <= INTEGER_TO_CHAR(9);
+            for wc in 1 to 4 loop
+                SCENARIO(5) <= INTEGER_TO_CHAR(wc);
+                wait for 0 ns;
+                wait_cycle := (0 => 20, 4 => wc, others => 0);
+                RUN_TEST(message, wait_cycle, CNT, 0, FALSE, TRUE, exp_digest);
             end loop;
         end procedure;
     begin
@@ -316,17 +388,21 @@ begin
         ---------------------------------------------------------------------------
         SCENARIO <= "1.0.0";
         wait for 0 ns;
-        RUN_TEST_ALL(1,
-                     string'("abc"),
-                     string'("0xddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f"));
+        RUN_TEST_OFFSET(
+            1,
+            string'("abc"),
+            string'("0xddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f")
+        );
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
         SCENARIO <= "2.0.0";
         wait for 0 ns;
-        RUN_TEST_ALL(1,
-                     string'("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"),
-                     string'("0x8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909"));
+        RUN_TEST_OFFSET(
+            1,
+            string'("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu"),
+            string'("0x8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909")
+        );
         ---------------------------------------------------------------------------
         -- ちょっとシミュレーションでは時間がかかりすぎるので現在は削除
         ---------------------------------------------------------------------------
@@ -340,11 +416,13 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
-        -- SCENARIO <= "4.0.0";
-        -- wait for 0 ns;
-        -- RUN_TEST_ALL(10,
-        --              string'("0123456701234567012345670123456701234567012345670123456701234567"),
-        --              string'("0x594847328451bdfa85056225462cc1d867d877fb388df0ce35f25ab5562bfbb5"));
+        SCENARIO <= "4.0.0";
+        wait for 0 ns;
+        RUN_TEST_TIMING(
+            10,
+            string'("0123456701234567012345670123456701234567012345670123456701234567"),
+            string'("0x89d05ba632c699c31231ded4ffc127d5a894dad412c0e024db872d1abd2ba8141a0f85072a9be1e2aa04cf33c765cb510813a39cd5a84c4acaa64d3f3fb7bae9")
+        );
         ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
@@ -479,6 +557,37 @@ begin
            SYMBOLS      => 8,
            WORDS        => 1,
            BLOCK_GAP    => 1,
+           VERBOSE      => 0,
+           AUTO_FINISH  => 1
+    ) port map (
+           FINISH       => open
+    );
+end MODEL;
+-----------------------------------------------------------------------------------
+--! @brief   SHA-512テストベンチ(WORDS=1,SYMBOLS=8,BLOCK_GAP=4)
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+entity  SHA512_TEST_BENCH_W1_S8_G4 is
+end     SHA512_TEST_BENCH_W1_S8_G4;
+architecture MODEL of SHA512_TEST_BENCH_W1_S8_G4 is
+    component  SHA512_TEST_BENCH
+        generic (
+            SYMBOLS     : integer;
+            WORDS       : integer;
+            BLOCK_GAP   : integer;
+            VERBOSE     : integer;
+            AUTO_FINISH : integer
+        );
+        port (
+            FINISH      : out std_logic
+        );
+    end component;
+begin
+    TB: SHA512_TEST_BENCH generic map(
+           SYMBOLS      => 8,
+           WORDS        => 1,
+           BLOCK_GAP    => 4,
            VERBOSE      => 0,
            AUTO_FINISH  => 1
     ) port map (

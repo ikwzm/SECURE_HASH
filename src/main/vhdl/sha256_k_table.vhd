@@ -51,7 +51,7 @@ entity  SHA256_K_TABLE is
     port (
         CLK         : in  std_logic;
         RST         : in  std_logic;
-        T           : in  integer range 0 to ROUNDS;
+        T           : in  integer range 0 to ROUNDS-1;
         K           : out std_logic_vector(WORD_BITS*WORDS-1 downto 0)
     );
 end SHA256_K_TABLE;

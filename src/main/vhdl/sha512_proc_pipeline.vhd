@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------
---!     @file    sha256_proc_pipeline.vhd
---!     @brief   SHA-256 Processing Module :
---!              SHA-256用計算モジュール(パイプライン版).
+--!     @file    sha512_proc_pipeline.vhd
+--!     @brief   SHA-512 Processing Module :
+--!              SHA-512用計算モジュール(パイプライン版).
 --!     @version 0.7.0
 --!     @date    2012/10/5
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
@@ -38,16 +38,16 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 library PipeWork;
-use     PipeWork.SHA256.WORD_BITS;
-use     PipeWork.SHA256.HASH_BITS;
+use     PipeWork.SHA512.WORD_BITS;
+use     PipeWork.SHA512.HASH_BITS;
 -----------------------------------------------------------------------------------
---! @brief   SHA256_PROC_PIPELINE :
---!          SHA-256用計算モジュール(パイプライン版).
+--! @brief   SHA512_PROC_PIPELINE :
+--!          SHA-512用計算モジュール(パイプライン版).
 -----------------------------------------------------------------------------------
-entity  SHA256_PROC_PIPELINE is
+entity  SHA512_PROC_PIPELINE is
     generic (
         WORDS       : --! @brief OUTPUT WORD SIZE :
-                      --! 出力側のワード数を指定する(1ワードは32bit).
+                      --! 出力側のワード数を指定する(1ワードは64bit).
                       integer := 1
     );
     port (
@@ -84,7 +84,7 @@ entity  SHA256_PROC_PIPELINE is
         O_RDY       : --! @brief OUTPUT WORD READY :
                       in  std_logic
     );
-end SHA256_PROC_PIPELINE;
+end SHA512_PROC_PIPELINE;
 -----------------------------------------------------------------------------------
 -- 
 -----------------------------------------------------------------------------------
@@ -92,8 +92,8 @@ library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
 library PipeWork;
-use     PipeWork.SHA256.all;
-architecture RTL of SHA256_PROC_PIPELINE is
+use     PipeWork.SHA512.all;
+architecture RTL of SHA512_PROC_PIPELINE is
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値
     -------------------------------------------------------------------------------
@@ -278,7 +278,7 @@ begin
     -- K[t]の生成
     -------------------------------------------------------------------------------
     k_num <= s_num when (END_NUM = ROUNDS or s_num < ROUNDS) else 0;
-    K_TBL: SHA256_K_TABLE generic map (1) port map (
+    K_TBL: SHA512_K_TABLE generic map (1) port map (
             CLK         => CLK, 
             RST         => RST,
             T           => k_num,

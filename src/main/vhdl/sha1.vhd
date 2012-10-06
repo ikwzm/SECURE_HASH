@@ -1,8 +1,9 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1.vhd
---!     @brief   SHA-1 MODULE :
---!     @version 0.6.0
---!     @date    2012/10/1
+--!     @brief   SHA-1 Package :
+--!              SHA-1用各種定義パッケージ.
+--!     @version 0.7.0
+--!     @date    2012/10/6
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,82 +38,147 @@
 library ieee;
 use     ieee.std_logic_1164.all;
 -----------------------------------------------------------------------------------
---! @brief   SHA-1 計算モジュール.
+--! @brief SHA-1用各種定義パッケージ.
 -----------------------------------------------------------------------------------
-entity  SHA1 is
-    generic (
-        SYMBOL_BITS : --! @brief INPUT SYMBOL BITS :
-                      --! 入力データの１シンボルのビット数を指定する.
-                      integer := 8;
-        SYMBOLS     : --! @brief INPUT SYMBOL SIZE :
-                      --! 入力データのシンボル数を指定する.
-                      integer := 4;
-        REVERSE     : --! @brief INPUT SYMBOL REVERSE :
-                      --! 入力データのシンボルのビット並びを逆にするかどうかを指定する.
-                      integer := 1;
-        WORDS       : --! @brief WORD SIZE :
-                      --! 一度に処理するワード数を指定する.
-                      integer := 1;
-        BLOCK_GAP   : --! @brief BLOCK GAP CYCLE :
-                      --! １ブロック(16word)処理する毎に挿入するギャップのサイクル
-                      --! 数を指定する.
-                      --! サイクル数分だけスループットが落ちるが、動作周波数が上が
-                      --! る可能性がある.
-                      integer := 1
-    );
-    port (
+package SHA1 is
     -------------------------------------------------------------------------------
-    -- クロック&リセット信号
+    -- ハッシュのビット数
     -------------------------------------------------------------------------------
-        CLK         : --! @brief CLOCK :
-                      --! クロック信号
-                      in  std_logic; 
-        RST         : --! @brief ASYNCRONOUSE RESET :
-                      --! 非同期リセット信号.アクティブハイ.
-                      in  std_logic;
-        CLR         : --! @brief SYNCRONOUSE RESET :
-                      --! 同期リセット信号.アクティブハイ.
-                      in  std_logic;
+    constant  HASH_BITS : integer := 160;
     -------------------------------------------------------------------------------
-    -- 入力側 I/F
+    -- １ワードのビット数
     -------------------------------------------------------------------------------
-        I_DATA      : --! @brief INPUT SYMBOL DATA :
-                      in  std_logic_vector(SYMBOL_BITS*SYMBOLS-1 downto 0);
-        I_ENA       : --! @brief INPUT SYMBOL DATA ENABLE :
-                      in  std_logic_vector(            SYMBOLS-1 downto 0);
-        I_DONE      : --! @brief INPUT SYMBOL DATA DONE :
-                      in  std_logic;
-        I_LAST      : --! @brief INPUT SYMBOL DATA LAST :
-                      in  std_logic;
-        I_VAL       : --! @brief INPUT SYMBOL DATA VALID :
-                      in  std_logic;
-        I_RDY       : --! @brief INPUT SYMBOL DATA READY :
-                      out std_logic;
+    constant  WORD_BITS : integer := 32;
     -------------------------------------------------------------------------------
-    -- 出力側 I/F
+    -- ラウンド数
     -------------------------------------------------------------------------------
-        O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(159 downto 0);
-        O_VAL       : --! @brief OUTPUT WORD VALID :
-                      out std_logic;
-        O_RDY       : --! @brief OUTPUT WORD READY :
-                      in  std_logic
-    );
-end SHA1;
------------------------------------------------------------------------------------
--- 
------------------------------------------------------------------------------------
-library ieee;
-use     ieee.std_logic_1164.all;
-use     ieee.numeric_std.all;
-architecture RTL of SHA1 is
+    constant  ROUNDS    : integer := 80;
     -------------------------------------------------------------------------------
-    -- 内部信号
+    -- ワードの型宣言
     -------------------------------------------------------------------------------
-    signal    m_word    : std_logic_vector(32*WORDS-1 downto 0);
-    signal    m_done    : std_logic;
-    signal    m_valid   : std_logic;
-    signal    m_ready   : std_logic;
+    subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
+    type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
+    constant  WORD_NULL : WORD_TYPE := (others => '0');
+    -------------------------------------------------------------------------------
+    -- ハッシュレジスタの初期値
+    -------------------------------------------------------------------------------
+    constant  H0_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"67452301"));
+    constant  H1_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"EFCDAB89"));
+    constant  H2_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"98BADCFE"));
+    constant  H3_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"10325476"));
+    constant  H4_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"C3D2E1F0"));
+    -------------------------------------------------------------------------------
+    -- K[t]の値
+    -------------------------------------------------------------------------------
+    constant  K0        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"5A827999"));
+    constant  K1        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"6ED9EBA1"));
+    constant  K2        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"8F1BBCDC"));
+    constant  K3        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"CA62C1D6"));
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function  RotL(X:WORD_TYPE;N:integer) return std_logic_vector;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function  Ch(B,C,D:WORD_TYPE) return std_logic_vector;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function  Parity(B,C,D:WORD_TYPE) return std_logic_vector;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function  Maj(B,C,D:WORD_TYPE) return std_logic_vector;
+    -------------------------------------------------------------------------------
+    -- SHA1_COREのコンポーネント宣言
+    -------------------------------------------------------------------------------
+    component SHA1_CORE
+        generic (
+            SYMBOL_BITS : --! @brief INPUT SYMBOL BITS :
+                          --! 入力データの１シンボルのビット数を指定する.
+                          integer := 8;
+            SYMBOLS     : --! @brief INPUT SYMBOL SIZE :
+                          --! 入力データのシンボル数を指定する.
+                          integer := 4;
+            REVERSE     : --! @brief INPUT SYMBOL REVERSE :
+                          --! 入力データのシンボルのビット並びを逆にするかどうかを指定する.
+                          integer := 1;
+            WORDS       : --! @brief WORD SIZE :
+                          --! 一度に処理するワード数を指定する.
+                          integer := 1;
+            BLOCK_GAP   : --! @brief BLOCK GAP CYCLE :
+                          --! １ブロック(16word)処理する毎に挿入するギャップのサイクル
+                          --! 数を指定する.
+                          --! サイクル数分だけスループットが落ちるが、動作周波数が上が
+                          --! る可能性がある.
+                          integer := 1
+        );
+        port (
+        ---------------------------------------------------------------------------
+        -- クロック&リセット信号
+        ---------------------------------------------------------------------------
+            CLK         : --! @brief CLOCK :
+                          --! クロック信号
+                          in  std_logic; 
+            RST         : --! @brief ASYNCRONOUSE RESET :
+                          --! 非同期リセット信号.アクティブハイ.
+                          in  std_logic;
+            CLR         : --! @brief SYNCRONOUSE RESET :
+                          --! 同期リセット信号.アクティブハイ.
+                          in  std_logic;
+        ---------------------------------------------------------------------------
+        -- 入力側 I/F
+        ---------------------------------------------------------------------------
+            I_DATA      : --! @brief INPUT SYMBOL DATA :
+                          in  std_logic_vector(SYMBOL_BITS*SYMBOLS-1 downto 0);
+            I_ENA       : --! @brief INPUT SYMBOL DATA ENABLE :
+                          in  std_logic_vector(            SYMBOLS-1 downto 0);
+            I_DONE      : --! @brief INPUT SYMBOL DATA DONE :
+                          in  std_logic;
+            I_LAST      : --! @brief INPUT SYMBOL DATA LAST :
+                          in  std_logic;
+            I_VAL       : --! @brief INPUT SYMBOL DATA VALID :
+                          in  std_logic;
+            I_RDY       : --! @brief INPUT SYMBOL DATA READY :
+                          out std_logic;
+        ---------------------------------------------------------------------------
+        -- 出力側 I/F
+        ---------------------------------------------------------------------------
+            O_DATA      : --! @brief OUTPUT WORD DATA :
+                          out std_logic_vector(HASH_BITS-1 downto 0);
+            O_VAL       : --! @brief OUTPUT WORD VALID :
+                          out std_logic;
+            O_RDY       : --! @brief OUTPUT WORD READY :
+                          in  std_logic
+        );
+    end component;
+    -------------------------------------------------------------------------------
+    -- SHA_SCHEDULEのコンポーネント宣言
+    -------------------------------------------------------------------------------
+    component SHA_SCHEDULE
+        generic (
+            WORD_BITS   : integer := WORD_BITS;
+            WORDS       : integer := 1;
+            INPUT_NUM   : integer := 16;
+            CALC_NUM    : integer := ROUNDS;
+            END_NUM     : integer := ROUNDS
+        );
+        port (
+            CLK         : in  std_logic; 
+            RST         : in  std_logic;
+            CLR         : in  std_logic;
+            I_DONE      : in  std_logic;
+            I_VAL       : in  std_logic;
+            I_RDY       : out std_logic;
+            O_INPUT     : out std_logic;
+            O_LAST      : out std_logic;
+            O_DONE      : out std_logic;
+            O_NUM       : out integer range 0 to END_NUM-1;
+            O_VAL       : out std_logic;
+            O_RDY       : in  std_logic
+        );
+    end component;
     -------------------------------------------------------------------------------
     -- SHA_PRE_PROCのコンポーネント宣言
     -------------------------------------------------------------------------------
@@ -153,61 +219,49 @@ architecture RTL of SHA1 is
             CLK         : in  std_logic; 
             RST         : in  std_logic;
             CLR         : in  std_logic;
-            M_DATA      : in  std_logic_vector(32*WORDS-1 downto 0);
+            M_DATA      : in  std_logic_vector(WORD_BITS*WORDS-1 downto 0);
             M_DONE      : in  std_logic;
             M_VAL       : in  std_logic;
             M_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(159 downto 0);
+            O_DATA      : out std_logic_vector(HASH_BITS-1 downto 0);
             O_VAL       : out std_logic;
             O_RDY       : in  std_logic
         );
     end component;
-begin
+end SHA1;
+-----------------------------------------------------------------------------------
+--! @brief SHA-1用各種プロシージャの定義.
+-----------------------------------------------------------------------------------
+library ieee;
+use     ieee.std_logic_1164.all;
+package body SHA1 is
     -------------------------------------------------------------------------------
-    -- 入力処理(パディング、入力ビット数の付加).
+    -- ローテート演算関数.
     -------------------------------------------------------------------------------
-    PRE_PROC: SHA_PRE_PROC               --
-        generic map(                     --
-            WORD_BITS   => 32          , --
-            WORDS       => WORDS       , --
-            SYMBOL_BITS => SYMBOL_BITS , --
-            SYMBOLS     => SYMBOLS     , --
-            REVERSE     => REVERSE       --
-        )                                --
-        port map (                       --
-            CLK         => CLK         , -- In  :
-            RST         => RST         , -- In  :
-            CLR         => CLR         , -- In  :
-            I_DATA      => I_DATA      , -- In  :
-            I_ENA       => I_ENA       , -- In  :
-            I_DONE      => I_DONE      , -- In  :
-            I_LAST      => I_LAST      , -- In  :
-            I_VAL       => I_VAL       , -- In  :
-            I_RDY       => I_RDY       , -- Out :
-            M_DATA      => m_word      , -- Out :
-            M_DONE      => m_done      , -- Out :
-            M_VAL       => m_valid     , -- Out :
-            M_RDY       => m_ready       -- In  :
-        );
+    function  RotL(X:WORD_TYPE;N:integer) return std_logic_vector is
+    begin
+        return X(WORD_TYPE'high-N downto WORD_TYPE'low     ) &
+               X(WORD_TYPE'high   downto WORD_TYPE'high-N+1);
+    end function;
     -------------------------------------------------------------------------------
-    -- Digestの計算.
+    -- 
     -------------------------------------------------------------------------------
-    PROC: SHA1_PROC                      --
-        generic map (                    --
-            WORDS       => WORDS       , -- 
-            PIPELINE    => 1           , --
-            BLOCK_GAP   => BLOCK_GAP     -- 
-        )                                --
-        port map (                       --
-            CLK         => CLK         , -- In  :
-            RST         => RST         , -- In  :
-            CLR         => CLR         , -- In  :
-            M_DATA      => m_word      , -- In  :
-            M_DONE      => m_done      , -- In  :
-            M_VAL       => m_valid     , -- In  :
-            M_RDY       => m_ready     , -- Out :
-            O_DATA      => O_DATA      , -- Out :
-            O_VAL       => O_VAL       , -- Out :
-            O_RDY       => O_RDY         -- In  :
-        );
-end RTL;
+    function Ch(B,C,D:WORD_TYPE) return std_logic_vector is
+    begin
+        return (B and C) or ((not B) and D);
+    end function;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function Parity(B,C,D:WORD_TYPE) return std_logic_vector is
+    begin
+        return B xor C xor D;
+    end function;
+    -------------------------------------------------------------------------------
+    -- 
+    -------------------------------------------------------------------------------
+    function Maj(B,C,D:WORD_TYPE) return std_logic_vector is
+    begin
+        return (B and C) or (B and D) or (C and D);
+    end function;
+end SHA1;

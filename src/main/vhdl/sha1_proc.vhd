@@ -2,8 +2,8 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.6.0
---!     @date    2012/10/1
+--!     @version 0.7.0
+--!     @date    2012/10/6
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,6 +37,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
+library PipeWork;
+use     PipeWork.SHA1.WORD_BITS;
+use     PipeWork.SHA1.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA1_PROC :
 --!          SHA-1用計算モジュール.
@@ -77,7 +80,7 @@ entity  SHA1_PROC is
     -- 入力側 I/F
     -------------------------------------------------------------------------------
         M_DATA      : --! @brief INPUT MESSAGE DATA :
-                      in  std_logic_vector(32*WORDS-1 downto 0);
+                      in  std_logic_vector(WORD_BITS*WORDS-1 downto 0);
         M_DONE      : --! @brief INPUT MESSAGE DONE :
                       in  std_logic;
         M_VAL       : --! @brief INPUT MESSAGE VALID :
@@ -88,7 +91,7 @@ entity  SHA1_PROC is
     -- 出力側 I/F
     -------------------------------------------------------------------------------
         O_DATA      : --! @brief OUTPUT WORD DATA :
-                      out std_logic_vector(159 downto 0);
+                      out std_logic_vector(HASH_BITS-1 downto 0);
         O_VAL       : --! @brief OUTPUT WORD VALID :
                       out std_logic;
         O_RDY       : --! @brief OUTPUT WORD READY :
@@ -101,21 +104,9 @@ end SHA1_PROC;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
+library PipeWork;
+use     PipeWork.SHA1.all;
 architecture RTL of SHA1_PROC is
-    -------------------------------------------------------------------------------
-    -- １ワードのビット数
-    -------------------------------------------------------------------------------
-    constant  WORD_BITS : integer := 32;
-    -------------------------------------------------------------------------------
-    -- ラウンド数
-    -------------------------------------------------------------------------------
-    constant  ROUNDS    : integer := 80;
-    -------------------------------------------------------------------------------
-    -- ワードの型宣言
-    -------------------------------------------------------------------------------
-    subtype   WORD_TYPE      is std_logic_vector(WORD_BITS-1 downto 0);
-    type      WORD_VECTOR    is array (INTEGER range <>) of WORD_TYPE;
-    constant  WORD_NULL : WORD_TYPE := (others => '0');
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値
     -------------------------------------------------------------------------------
@@ -173,80 +164,16 @@ architecture RTL of SHA1_PROC is
     signal    h2        : WORD_TYPE;
     signal    h3        : WORD_TYPE;
     signal    h4        : WORD_TYPE;
-    constant  H0_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"67452301"));
-    constant  H1_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"EFCDAB89"));
-    constant  H2_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"98BADCFE"));
-    constant  H3_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"10325476"));
-    constant  H4_INIT   : WORD_TYPE := To_StdLogicVector(bit_vector'(X"C3D2E1F0"));
     -------------------------------------------------------------------------------
     -- K[t]
     -------------------------------------------------------------------------------
     signal    k         : WORD_VECTOR(0 to WORDS);
-    constant  K0        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"5A827999"));
-    constant  K1        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"6ED9EBA1"));
-    constant  K2        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"8F1BBCDC"));
-    constant  K3        : WORD_TYPE := To_StdLogicVector(bit_vector'(X"CA62C1D6"));
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
     signal    o_last    : std_logic;
     signal    o_done    : std_logic;
     signal    o_valid   : std_logic;
-    -------------------------------------------------------------------------------
-    -- ローテート演算関数.
-    -------------------------------------------------------------------------------
-    function  RotL(X:WORD_TYPE;N:integer) return WORD_TYPE is
-    begin
-        return X(WORD_TYPE'high-N downto WORD_TYPE'low     ) &
-               X(WORD_TYPE'high   downto WORD_TYPE'high-N+1);
-    end function;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    function Ch(B,C,D:WORD_TYPE) return std_logic_vector is
-    begin
-        return (B and C) or ((not B) and D);
-    end function;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    function Parity(B,C,D:WORD_TYPE) return std_logic_vector is
-    begin
-        return B xor C xor D;
-    end function;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    function Maj(B,C,D:WORD_TYPE) return std_logic_vector is
-    begin
-        return (B and C) or (B and D) or (C and D);
-    end function;
-    -------------------------------------------------------------------------------
-    -- 
-    -------------------------------------------------------------------------------
-    component SHA_SCHEDULE
-        generic (
-            WORD_BITS   : integer := 32;
-            WORDS       : integer := 1;
-            INPUT_NUM   : integer := 16;
-            CALC_NUM    : integer := 80;
-            END_NUM     : integer := 80
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            I_DONE      : in  std_logic;
-            I_VAL       : in  std_logic;
-            I_RDY       : out std_logic;
-            O_INPUT     : out std_logic;
-            O_LAST      : out std_logic;
-            O_DONE      : out std_logic;
-            O_NUM       : out integer range 0 to END_NUM-1;
-            O_VAL       : out std_logic;
-            O_RDY       : in  std_logic
-        );
-    end component;
 begin
     -------------------------------------------------------------------------------
     -- スケジューラ

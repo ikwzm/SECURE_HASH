@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_test_bench.vhd
 --!     @brief   SHA-1 TEST BENCH :
---!     @version 0.6.0
---!     @date    2012/10/1
+--!     @version 0.7.0
+--!     @date    2012/10/6
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -61,8 +61,10 @@ library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.INTEGER_TO_STRING;
 use     DUMMY_PLUG.UTIL.HEX_TO_STRING;
 use     DUMMY_PLUG.UTIL.STRING_TO_STD_LOGIC_VECTOR;
+library PipeWork;
+use     PipeWork.SHA1.SHA1_CORE;
+use     PipeWork.SHA1.HASH_BITS;
 architecture MODEL of SHA1_TEST_BENCH is
-    constant  HASH_BITS     : integer := 160;
     constant  SYMBOL_BITS   : integer := 8;
     constant  REVERSE       : integer := 1;
     signal    SCENARIO      : STRING(1 to 5);
@@ -80,29 +82,6 @@ architecture MODEL of SHA1_TEST_BENCH is
     signal    O_DATA        : std_logic_vector(HASH_BITS-1 downto 0);
     signal    O_VAL         : std_logic;
     signal    O_RDY         : std_logic;
-    component SHA1 
-        generic (
-            SYMBOL_BITS : integer := 8;
-            SYMBOLS     : integer := 4;
-            REVERSE     : integer := 1;
-            WORDS       : integer := 1;
-            BLOCK_GAP   : integer := 1
-        );
-        port (
-            CLK         : in  std_logic; 
-            RST         : in  std_logic;
-            CLR         : in  std_logic;
-            I_DATA      : in  std_logic_vector(SYMBOL_BITS*SYMBOLS-1 downto 0);
-            I_ENA       : in  std_logic_vector(            SYMBOLS-1 downto 0);
-            I_DONE      : in  std_logic;
-            I_LAST      : in  std_logic;
-            I_VAL       : in  std_logic;
-            I_RDY       : out std_logic;
-            O_DATA      : out std_logic_vector(HASH_BITS-1 downto 0);
-            O_VAL       : out std_logic;
-            O_RDY       : in  std_logic
-        );
-    end component;
     subtype   SYMBOL_TYPE      is std_logic_vector(SYMBOL_BITS-1 downto 0);
     type      SYMBOL_VECTOR    is array (INTEGER range <>) of SYMBOL_TYPE;
     constant  SYMBOL_NULL      : SYMBOL_TYPE := (others => '0');
@@ -137,7 +116,7 @@ begin
     -------------------------------------------------------------------------------
     -- 
     -------------------------------------------------------------------------------
-    DUT: SHA1 
+    DUT: SHA1_CORE
         generic map (
             SYMBOL_BITS => SYMBOL_BITS ,
             SYMBOLS     => SYMBOLS     ,
