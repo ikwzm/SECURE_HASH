@@ -35,63 +35,63 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <td align="right" rowspan="2">1</td>
     <td align="right">0</td>
     <td align="right">80</td>
-    <td align="right">1164,1449</td>
-    <td align="right">122[MHz]</td>
-    <td align="right">780[Mbit/sec]</td>
+    <td align="right">1151,1590</td>
+    <td align="right">145[MHz]</td>
+    <td align="right">928[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">81</td>
-    <td align="right">1170,1532</td>
-    <td align="right">128[MHz]</td>
-    <td align="right">810[Mbit/sec]</td>
+    <td align="right">1157,1730</td>
+    <td align="right">141[MHz]</td>
+    <td align="right">890[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
     <td align="right">0</td>
     <td align="right">40</td>
-    <td align="right">1323,1790</td>
-    <td align="right">84[MHz]</td>
-    <td align="right">1076[Mbit/sec]</td>
+    <td align="right">1525,1873</td>
+    <td align="right">87[MHz]</td>
+    <td align="right">1113[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">41</td>
-    <td align="right">1325,1823</td>
-    <td align="right">89[MHz]</td>
-    <td align="right">1115[Mbit/sec]</td>
+    <td align="right">1527,1914</td>
+    <td align="right">91[MHz]</td>
+    <td align="right">1135[Mbit/sec]</td>
   </tr>
   <tr>
     <th align="right" rowspan="4">Virtex6</th>
-    <th align="right" rowspan="4">-2</th>
+    <th align="right" rowspan="4">-3</th>
     <td align="right" rowspan="2">1</td>
     <td align="right">0</td>
     <td align="right">80</td>
-    <td align="right">1125,1399</td>
-    <td align="right">150[MHz]</td>
-    <td align="right">970[Mbit/sec]</td>
+    <td align="right">1138,1609</td>
+    <td align="right">204[MHz]</td>
+    <td align="right">1306[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">81</td>
-    <td align="right">1126,1449</td>
-    <td align="right">158[MHz]</td>
-    <td align="right">1003[Mbit/sec]</td>
+    <td align="right">1139,1680</td>
+    <td align="right">227[MHz]</td>
+    <td align="right">1436[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
     <td align="right">0</td>
     <td align="right">40</td>
-    <td align="right">1317,1785</td>
-    <td align="right">101[MHz]</td>
-    <td align="right">1293[Mbit/sec]</td>
+    <td align="right">1515,1851</td>
+    <td align="right">133[MHz]</td>
+    <td align="right">1707[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">41</td>
-    <td align="right">1317,1820</td>
-    <td align="right">105[MHz]</td>
-    <td align="right">1315[Mbit/sec]</td>
+    <td align="right">1517,1897</td>
+    <td align="right">136[MHz]</td>
+    <td align="right">1711[Mbit/sec]</td>
   </tr>
   <tr>
     <th colspan="9">SHA-256 WORD=32bit BLOCK=512bit</th>
@@ -107,68 +107,82 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <th>Throughput</th>
   </tr>
   <tr>
-    <th align="right" rowspan="4">Spartan6</th>
-    <th align="right" rowspan="4">-3</th>
-    <td align="right" rowspan="2">1</td>
+    <th align="right" rowspan="5">Spartan6</th>
+    <th align="right" rowspan="5">-3</th>
+    <td align="right" rowspan="3">1</td>
     <td align="right">0</td>
     <td align="right">64</td>
-    <td align="right">1437,1880</td>
+    <td align="right">1460,2587</td>
     <td align="right">102[MHz]</td>
     <td align="right">816[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">65</td>
-    <td align="right">1412,1922</td>
-    <td align="right">115[MHz]</td>
-    <td align="right">906[Mbit/sec]</td>
+    <td align="right">1442,2597</td>
+    <td align="right">128[MHz]</td>
+    <td align="right">1010[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">68</td>
+    <td align="right">1600,3156</td>
+    <td align="right">181[MHz]</td>
+    <td align="right">1369[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
     <td align="right">0</td>
     <td align="right">32</td>
-    <td align="right">1684,2471</td>
-    <td align="right">61[MHz]</td>
-    <td align="right">970[Mbit/sec]</td>
+    <td align="right">1862,3096</td>
+    <td align="right">59[MHz]</td>
+    <td align="right">941[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">33</td>
-    <td align="right">1657,2483</td>
+    <td align="right">1835,3094</td>
     <td align="right">69[MHz]</td>
     <td align="right">1070[Mbit/sec]</td>
   </tr>
   <tr>
-    <th align="right" rowspan="4">Virtex6</th>
-    <th align="right" rowspan="4">-2</th>
-    <td align="right" rowspan="2">1</td>
+    <th align="right" rowspan="5">Virtex6</th>
+    <th align="right" rowspan="5">-3</th>
+    <td align="right" rowspan="3">1</td>
     <td align="right">0</td>
     <td align="right">64</td>
-    <td align="right">1431,1942</td>
-    <td align="right">105[MHz]</td>
-    <td align="right">842[Mbit/sec]</td>
+    <td align="right">1452,2546</td>
+    <td align="right">163[MHz]</td>
+    <td align="right">1311[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">65</td>
-    <td align="right">1404,1943</td>
-    <td align="right">135[MHz]</td>
-    <td align="right">1064[Mbit/sec]</td>
+    <td align="right">1425,2583</td>
+    <td align="right">200[MHz]</td>
+    <td align="right">1575[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">68</td>
+    <td align="right">1,567,2861</td>
+    <td align="right">227[MHz]</td>
+    <td align="right">1711[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
     <td align="right">0</td>
     <td align="right">32</td>
-    <td align="right">1680,2527</td>
-    <td align="right">87[MHz]</td>
-    <td align="right">1113[Mbit/sec]</td>
+    <td align="right">1858,3094</td>
+    <td align="right">95[MHz]</td>
+    <td align="right">1524[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right">1</td>
     <td align="right">33</td>
-    <td align="right">1653,2539</td>
-    <td align="right">101[MHz]</td>
-    <td align="right">1261[Mbit/sec]</td>
+    <td align="right">1831,3078</td>
+    <td align="right">114[MHz]</td>
+    <td align="right">1763[Mbit/sec]</td>
   </tr>
   <tr>
     <th colspan="9">SHA-512 WORD=64bit BLOCK=1024bit</th>
@@ -184,68 +198,82 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <th>Throughput</th>
   </tr>
   <tr>
-    <th align="right" rowspan="4">Spartan6</th>
-    <th align="right" rowspan="4">-3</th>
-    <td align="right" rowspan="2">1</td>
+    <th align="right" rowspan="5">Spartan6</th>
+    <th align="right" rowspan="5">-3</th>
+    <td align="right" rowspan="3">1</td>
     <td align="right">0</td>
     <td align="right">80</td>
-    <td align="right">2785,3758</td>
-    <td align="right">95[MHz]</td>
-    <td align="right">1219[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right">1</td>
-    <td align="right">81</td>
-    <td align="right">2728,3802</td>
-    <td align="right">102[MHz]</td>
-    <td align="right">1290[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right" rowspan="2">2</td>
-    <td align="right">0</td>
-    <td align="right">40</td>
-    <td align="right">3293,4903</td>
-    <td align="right">53[MHz]</td>
-    <td align="right">1362[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right">1</td>
-    <td align="right">41</td>
-    <td align="right">3233,4978</td>
-    <td align="right">62[MHz]</td>
-    <td align="right">1542[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <th align="right" rowspan="4">Virtex6</th>
-    <th align="right" rowspan="4">-2</th>
-    <td align="right" rowspan="2">1</td>
-    <td align="right">0</td>
-    <td align="right">80</td>
-    <td align="right">2780,3750</td>
-    <td align="right">100[MHz]</td>
-    <td align="right">1280[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right">1</td>
-    <td align="right">81</td>
-    <td align="right">2720,3765</td>
-    <td align="right">125[MHz]</td>
-    <td align="right">1580[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right" rowspan="2">2</td>
-    <td align="right">0</td>
-    <td align="right">40</td>
-    <td align="right">3289,4895</td>
-    <td align="right">77[MHz]</td>
-    <td align="right">1969[Mbit/sec]</td>
-  </tr>
-  <tr>
-    <td align="right">1</td>
-    <td align="right">41</td>
-    <td align="right">3229,4985</td>
+    <td align="right">2880,8091</td>
     <td align="right">83[MHz]</td>
-    <td align="right">2081[Mbit/sec]</td>
+    <td align="right">1067[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">2842,8133</td>
+    <td align="right">109[MHz]</td>
+    <td align="right">1374[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">84</td>
+    <td align="right">3093,8934</td>
+    <td align="right">123[MHz]</td>
+    <td align="right">1505[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">3705,10270</td>
+    <td align="right">45[MHz]</td>
+    <td align="right">1163[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">3648,10361</td>
+    <td align="right">59[MHz]</td>
+    <td align="right">1469[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="5">Virtex6</th>
+    <th align="right" rowspan="5">-3</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">2876,8012</td>
+    <td align="right">147[MHz]</td>
+    <td align="right">1882[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">2818,8207</td>
+    <td align="right">164[MHz]</td>
+    <td align="right">2072[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">84</td>
+    <td align="right">3092,8705</td>
+    <td align="right">200[MHz]</td>
+    <td align="right">2438[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">3701,10387</td>
+    <td align="right">87[MHz]</td>
+    <td align="right">2226[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">3641,10429</td>
+    <td align="right">95[MHz]</td>
+    <td align="right">2379[Mbit/sec]</td>
   </tr>
 </table>
 
