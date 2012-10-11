@@ -1,4 +1,4 @@
 
 #Created by Constraints Editor (xc6slx75-fgg676-3) - 2012/10/06
 NET "ACLK" TNM_NET = ACLK;
-TIMESPEC TS_ACLK = PERIOD "ACLK" 5 ns HIGH 50%;
+TIMESPEC TS_ACLK = PERIOD "ACLK" 4 ns HIGH 50%;

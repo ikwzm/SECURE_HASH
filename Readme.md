@@ -126,9 +126,9 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">68</td>
-    <td align="right">1600,3156</td>
-    <td align="right">181[MHz]</td>
-    <td align="right">1369[Mbit/sec]</td>
+    <td align="right">1547,3080</td>
+    <td align="right">188[MHz]</td>
+    <td align="right">1418[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
@@ -165,9 +165,9 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">68</td>
-    <td align="right">1,567,2861</td>
-    <td align="right">227[MHz]</td>
-    <td align="right">1711[Mbit/sec]</td>
+    <td align="right">1537,2914</td>
+    <td align="right">250[MHz]</td>
+    <td align="right">1882[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>

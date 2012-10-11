@@ -2,8 +2,8 @@
 --!     @file    sha512_proc_pipeline.vhd
 --!     @brief   SHA-512 Processing Module :
 --!              SHA-512用計算モジュール(パイプライン版).
---!     @version 0.7.0
---!     @date    2012/10/5
+--!     @version 0.7.1
+--!     @date    2012/10/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -293,6 +293,7 @@ begin
         variable sigma1 : WORD_TYPE;
         variable ch0    : WORD_TYPE;
         variable ma0    : WORD_TYPE;
+        variable t6     : WORD_TYPE;
     begin
         if (RST = '1') then
                 p_valid  <= (others => '0');
@@ -321,33 +322,8 @@ begin
                 t4       <= WORD_NULL;
                 t5       <= WORD_NULL;
         elsif (CLK'event and CLK = '1') then
-            if (CLR = '1') then
-                p_valid  <= (others => '0');
-                p_last   <= (others => '0');
-                p_first  <= (others => '0');
-                p_hole   <= (others => '0');
-                p_resume <= (others => '0');
-                h0       <= H0_INIT;
-                h1       <= H1_INIT;
-                h2       <= H2_INIT;
-                h3       <= H3_INIT;
-                h4       <= H4_INIT;
-                h5       <= H5_INIT;
-                h6       <= H6_INIT;
-                h7       <= H7_INIT;
-                a        <= H0_INIT;
-                b        <= H1_INIT;
-                c        <= H2_INIT;
-                d        <= H3_INIT;
-                e        <= H4_INIT;
-                f        <= H5_INIT;
-                g        <= H6_INIT;
-                h        <= H7_INIT;
-                t2       <= WORD_NULL;
-                t3       <= WORD_NULL;
-                t4       <= WORD_NULL;
-                t5       <= WORD_NULL;
-            elsif (o_done  = '1') then
+            if (CLR    = '1') or
+               (o_done = '1') then
                 p_valid  <= (others => '0');
                 p_last   <= (others => '0');
                 p_first  <= (others => '0');
@@ -415,27 +391,30 @@ begin
                 p_resume(0) <= w_resume; p_resume(1 to p_resume'high) <= p_resume(0 to p_resume'high-1);
                 if (w_valid = '1') then
                     if    (w_first     = '1') then
-                        h <= h6;
+                        h <= h7;
                     elsif (p_first(0)  = '1') then
-                        h <= h5;
-                    elsif (p_first(1)  = '1') then
-                        h <= h4;
+                        h <= h6;
                     elsif (w_resume    = '1') then
-                        h <= g;
+                        h <= h;
                     elsif (p_resume(0) = '1') then
-                        h <= f;
+                        h <= g;
                     else
-                        h <= e;
+                        h <= f;
                     end if;
-                    t5 <= std_logic_vector(unsigned(h) + (unsigned(w) + unsigned(k)));
+                else
+                    if (p_valid(1) = '1') then
+                        h <= g;
+                    end if;
                 end if;
-                if (p_valid(0) = '1') then
-                    if    (p_first(0)  = '1') then
+                if (w_valid = '1') then
+                    if    (w_first     = '1') then
+                        d <= h3;
+                    elsif (p_first(0)  = '1') then
                         d <= h2;
                     elsif (p_first(1)  = '1') then
                         d <= h1;
-                    elsif (p_first(2)  = '1') then
-                        d <= h0;
+                    elsif (w_resume    = '1') then
+                        d <= d;
                     elsif (p_resume(0) = '1') then
                         d <= c;
                     elsif (p_resume(1) = '1') then
@@ -443,14 +422,24 @@ begin
                     else
                         d <= a;
                     end if;
-                    t3 <= std_logic_vector(unsigned(t5) + unsigned(d));
-                    t4 <= t5;
+                else
+                    if (p_valid(2) = '1') then
+                        d <= c;
+                    end if;
+                end if;
+                if (w_valid = '1') then
+                    t5 <= std_logic_vector(unsigned(w) + unsigned(k));
+                end if;
+                if (p_valid(0) = '1') then
+                    t6 := std_logic_vector(unsigned(t5) + unsigned(h));
+                    t3 <= t6;
+                    t4 <= std_logic_vector(unsigned(t6) + unsigned(d));
                 end if;
                 if (p_valid(1) = '1') then
                     sigma1 := SigmaA1(e);
                     ch0    := Ch (e,f,g);
-                    t2 <= std_logic_vector(unsigned(ch0) + (unsigned(sigma1) + unsigned(t4)));
-                    e  <= std_logic_vector(unsigned(ch0) + (unsigned(sigma1) + unsigned(t3)));
+                    t2 <= std_logic_vector(unsigned(ch0) + (unsigned(sigma1) + unsigned(t3)));
+                    e  <= std_logic_vector(unsigned(ch0) + (unsigned(sigma1) + unsigned(t4)));
                     f  <= e;
                     g  <= f;
                 end if;
