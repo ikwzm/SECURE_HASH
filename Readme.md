@@ -6,14 +6,23 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
 
 論理合成可能です。
 
-１クロックで１、２、４、８ワード(１ワードは32bit)処理できます.
+１クロックで１、２ワード(１ワードはSHA-1およびSHA-256で32bit、SHA-512では64bit)処理できます.
 
 ###論理合成###
-論理合成を行うためには次のファイルが必要です。
+
+
+####他に必要なファイル####
+論理合成を行うためには次のファイルが必要です.
 
 * PipeWorkのコンポーネント宣言パッケージ   components.vhd (<https://github.com/ikwzm/PipeWork.git>)
 * 異なるデータ幅のパスを継ぐためのアダプタ reducer.vhd    (<https://github.com/ikwzm/PipeWork.git>)
 
+####開発環境####
+以下の開発環境で合成出来ることを確認しています.
+
+* Xilinx ISE14.2
+
+####論理合成の結果####
 
 <table border="1">
   <tr>
@@ -126,9 +135,9 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">68</td>
-    <td align="right">1547,3080</td>
-    <td align="right">188[MHz]</td>
-    <td align="right">1418[Mbit/sec]</td>
+    <td align="right">1555,2971</td>
+    <td align="right">178[MHz]</td>
+    <td align="right">1344[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
@@ -165,7 +174,7 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">68</td>
-    <td align="right">1537,2914</td>
+    <td align="right">1530,2766</td>
     <td align="right">250[MHz]</td>
     <td align="right">1882[Mbit/sec]</td>
   </tr>
@@ -217,9 +226,9 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">84</td>
-    <td align="right">3093,8934</td>
-    <td align="right">123[MHz]</td>
-    <td align="right">1505[Mbit/sec]</td>
+    <td align="right">3024,8755</td>
+    <td align="right">125[MHz]</td>
+    <td align="right">1524[Mbit/sec]</td>
   </tr>
   <tr>
     <td align="right" rowspan="2">2</td>
@@ -256,7 +265,7 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
   <tr>
     <td align="right">4</td>
     <td align="right">84</td>
-    <td align="right">3092,8705</td>
+    <td align="right">3023,8538</td>
     <td align="right">200[MHz]</td>
     <td align="right">2438[Mbit/sec]</td>
   </tr>

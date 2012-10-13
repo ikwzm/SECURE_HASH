@@ -3,7 +3,7 @@
 --!     @brief   SHA-512 Processing Module :
 --!              SHA-512用計算モジュール(パイプライン版).
 --!     @version 0.7.1
---!     @date    2012/10/12
+--!     @date    2012/10/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -108,18 +108,12 @@ architecture RTL of SHA512_PROC_PIPELINE is
     signal    s_input   : std_logic;
     signal    s_valid   : std_logic;
     signal    s_ready   : std_logic;
-    signal    s_hole    : std_logic;
-    signal    wait_done : std_logic;
-    signal    wait_hole : std_logic;
     -------------------------------------------------------------------------------
     -- W[t]
     -------------------------------------------------------------------------------
     signal    w_done    : std_logic;
     signal    w_last    : std_logic;
-    signal    w_first   : std_logic;
     signal    w_valid   : std_logic;
-    signal    w_hole    : std_logic;
-    signal    w_resume  : std_logic;
     signal    w_reg     : WORD_VECTOR(0 to 15);
     signal    w         : WORD_TYPE;
     -------------------------------------------------------------------------------
@@ -154,20 +148,20 @@ architecture RTL of SHA512_PROC_PIPELINE is
     signal    k_num     : integer range 0 to ROUNDS-1;
     signal    k         : WORD_TYPE;
     -------------------------------------------------------------------------------
-    -- 
+    -- Pipeline Flags
     -------------------------------------------------------------------------------
-    signal    p_first   : std_logic_vector(0 to 2);
+    type      H_OP_TYPE is (H_HOLD, H_SET_G, H_SET_F);
+    type      D_OP_TYPE is (D_HOLD, D_SET_C, D_SET_B, D_SET_A);
+    signal    h_op      : H_OP_TYPE;
+    signal    d_op      : D_OP_TYPE;
     signal    p_last    : std_logic_vector(0 to 2);
-    signal    p_valid   : std_logic_vector(0 to 3);
-    signal    p_hole    : std_logic_vector(0 to 2);
-    signal    p_resume  : std_logic_vector(0 to 1);
+    signal    p_valid   : std_logic_vector(0 to 2);
     -------------------------------------------------------------------------------
-    -- 
+    -- Output Flags
     -------------------------------------------------------------------------------
     signal    o_last    : std_logic;
     signal    o_done    : std_logic;
     signal    o_valid   : std_logic;
-    signal    o_hole    : std_logic;
 begin
     -------------------------------------------------------------------------------
     -- スケジューラ
@@ -195,25 +189,14 @@ begin
             O_RDY       => s_ready       -- In  :
         );
     process (CLK, RST) begin
-        if         (RST   = '1') then wait_done <= '0';
+        if         (RST   = '1') then s_ready <= '1';
         elsif (CLK'event and CLK = '1') then
-            if    (CLR    = '1') then wait_done <= '0';
-            elsif (o_done = '1') then wait_done <= '0';
-            elsif (s_done = '1') then wait_done <= '1';
+            if    (CLR    = '1') then s_ready <= '1';
+            elsif (o_done = '1') then s_ready <= '1';
+            elsif (s_done = '1') then s_ready <= '0';
             end if;
         end if;
     end process;
-    process (CLK, RST) begin
-        if         (RST   = '1') then wait_hole <= '0';
-        elsif (CLK'event and CLK = '1') then
-            if    (CLR    = '1') then wait_hole <= '0';
-            elsif (o_hole = '1') then wait_hole <= '0';
-            elsif (s_hole = '1') then wait_hole <= '1';
-            end if;
-        end if;
-    end process;
-    s_hole  <= '1' when (s_valid   = '0' and w_valid   = '1' and w_last = '0') else '0';
-    s_ready <= '1' when (wait_done = '0' and wait_hole = '0') else '0';
     -------------------------------------------------------------------------------
     -- W[t]の生成
     -------------------------------------------------------------------------------
@@ -225,16 +208,12 @@ begin
                 w_valid <= '0';
                 w_done  <= '0';
                 w_last  <= '0';
-                w_first <= '0';
-                w_resume<= '0';
         elsif (CLK'event and CLK = '1') then
             if (CLR = '1') then
                 w_reg   <= (others => WORD_NULL);
                 w_valid <= '0';
                 w_done  <= '0';
                 w_last  <= '0';
-                w_first <= '0';
-                w_resume<= '0';
             else
                 if (s_valid = '1' and s_ready = '1') then
                     w_work(0 to 15) := w_reg(0 to 15);
@@ -259,17 +238,6 @@ begin
                 end if;
                 w_done  <= s_done;
                 w_last  <= s_last;
-                w_hole  <= s_hole;
-                if (s_valid = '1' and s_ready = '1' and s_num = 0) then
-                    w_first <= '1';
-                else
-                    w_first <= '0';
-                end if;
-                if (w_valid = '0' and s_valid = '1' and s_ready = '1' and s_num /= 0) then
-                    w_resume <= '1';
-                else
-                    w_resume <= '0';
-                end if;
             end if;
         end if;
     end process;
@@ -298,9 +266,8 @@ begin
         if (RST = '1') then
                 p_valid  <= (others => '0');
                 p_last   <= (others => '0');
-                p_first  <= (others => '0');
-                p_hole   <= (others => '0');
-                p_resume <= (others => '0');
+                d_op     <= D_HOLD;
+                h_op     <= H_HOLD;
                 h0       <= H0_INIT;
                 h1       <= H1_INIT;
                 h2       <= H2_INIT;
@@ -326,9 +293,8 @@ begin
                (o_done = '1') then
                 p_valid  <= (others => '0');
                 p_last   <= (others => '0');
-                p_first  <= (others => '0');
-                p_hole   <= (others => '0');
-                p_resume <= (others => '0');
+                d_op     <= D_HOLD;
+                h_op     <= H_HOLD;
                 h0       <= H0_INIT;
                 h1       <= H1_INIT;
                 h2       <= H2_INIT;
@@ -352,9 +318,8 @@ begin
             elsif (o_last = '1') then
                 p_valid  <= (others => '0');
                 p_last   <= (others => '0');
-                p_first  <= (others => '0');
-                p_hole   <= (others => '0');
-                p_resume <= (others => '0');
+                d_op     <= D_HOLD;
+                h_op     <= H_HOLD;
                 h_next(0) := std_logic_vector(unsigned(h0) + unsigned(a));
                 h_next(1) := std_logic_vector(unsigned(h1) + unsigned(b));
                 h_next(2) := std_logic_vector(unsigned(h2) + unsigned(c));
@@ -384,51 +349,67 @@ begin
                 t4       <= WORD_NULL;
                 t5       <= WORD_NULL;
             else
-                p_valid (0) <= w_valid ; p_valid (1 to p_valid 'high) <= p_valid (0 to p_valid 'high-1);
-                p_last  (0) <= w_last  ; p_last  (1 to p_last  'high) <= p_last  (0 to p_last  'high-1);
-                p_first (0) <= w_first ; p_first (1 to p_first 'high) <= p_first (0 to p_first 'high-1);
-                p_hole  (0) <= w_hole  ; p_hole  (1 to p_hole  'high) <= p_hole  (0 to p_hole  'high-1);
-                p_resume(0) <= w_resume; p_resume(1 to p_resume'high) <= p_resume(0 to p_resume'high-1);
-                if (w_valid = '1') then
-                    if    (w_first     = '1') then
-                        h <= h7;
-                    elsif (p_first(0)  = '1') then
-                        h <= h6;
-                    elsif (w_resume    = '1') then
-                        h <= h;
-                    elsif (p_resume(0) = '1') then
-                        h <= g;
+                for i in p_valid'range loop
+                    if (i > 0) then
+                        p_valid(i) <= p_valid(i-1);
+                        p_last (i) <= p_last (i-1);
                     else
-                        h <= f;
+                        p_valid(i) <= w_valid;
+                        p_last (i) <= w_last;
                     end if;
-                else
-                    if (p_valid(1) = '1') then
-                        h <= g;
-                    end if;
-                end if;
+                end loop;
+                case d_op is
+                    when D_SET_A => d <= a;
+                                    if    (w_valid = '0' and p_valid(2) = '1') then
+                                        d_op <= D_SET_B;
+                                    else
+                                        d_op <= D_SET_A;
+                                    end if;
+                    when D_SET_B => d <= b;
+                                    if    (w_valid = '0' and p_valid(2) = '1') then
+                                        d_op <= D_SET_C;
+                                    elsif (w_valid = '1' and p_valid(2) = '0') then
+                                        d_op <= D_SET_A;
+                                    else
+                                        d_op <= D_SET_B;
+                                    end if;
+                    when D_SET_C => d <= c;
+                                    if    (w_valid = '0' and p_valid(2) = '1') then
+                                        d_op <= D_HOLD;
+                                    elsif (w_valid = '1' and p_valid(2) = '0') then
+                                        d_op <= D_SET_B;
+                                    else
+                                        d_op <= D_SET_C;
+                                    end if;
+                    when others  => if    (w_valid = '1' and p_valid(2) = '0') then
+                                        d_op <= D_SET_C;
+                                    else
+                                        d_op <= D_HOLD;
+                                    end if;
+                end case;
+                case h_op is
+                    when H_SET_F => h <= f;
+                                    if    (w_valid = '0' and p_valid(1) = '1') then
+                                        h_op <= H_SET_G;
+                                    else
+                                        h_op <= H_SET_F;
+                                    end if;
+                    when H_SET_G => h <= g;
+                                    if    (w_valid = '0' and p_valid(1) = '1') then
+                                        h_op <= H_HOLD;
+                                    elsif (w_valid = '1' and p_valid(1) = '0') then
+                                        h_op <= H_SET_F;
+                                    else
+                                        h_op <= H_SET_G;
+                                    end if;
+                    when others  => if    (w_valid = '1' and p_valid(1) = '0') then
+                                        h_op <= H_SET_G;
+                                    else
+                                        h_op <= H_HOLD;
+                                    end if;
+                end case;
                 if (w_valid = '1') then
-                    if    (w_first     = '1') then
-                        d <= h3;
-                    elsif (p_first(0)  = '1') then
-                        d <= h2;
-                    elsif (p_first(1)  = '1') then
-                        d <= h1;
-                    elsif (w_resume    = '1') then
-                        d <= d;
-                    elsif (p_resume(0) = '1') then
-                        d <= c;
-                    elsif (p_resume(1) = '1') then
-                        d <= b;
-                    else
-                        d <= a;
-                    end if;
-                else
-                    if (p_valid(2) = '1') then
-                        d <= c;
-                    end if;
-                end if;
-                if (w_valid = '1') then
-                    t5 <= std_logic_vector(unsigned(w) + unsigned(k));
+                    t5 <= std_logic_vector(unsigned(w)  + unsigned(k));
                 end if;
                 if (p_valid(0) = '1') then
                     t6 := std_logic_vector(unsigned(t5) + unsigned(h));
@@ -465,7 +446,7 @@ begin
                 o_last  <= '0';
                 o_valid <= '0';
             else
-                o_last  <= p_last(2);
+                o_last  <= p_last(p_last'high);
                 if    (o_done = '1') then
                     o_valid <= '0';
                 elsif (w_done = '1') then
@@ -477,5 +458,4 @@ begin
     O_DATA <= h0 & h1 & h2 & h3 & h4 & h5 & h6 & h7;
     O_VAL  <= o_valid;
     o_done <= '1' when (o_valid = '1' and O_RDY = '1') else '0';
-    o_hole <= '1' when (p_hole(2) = '1') else '0';
 end RTL;

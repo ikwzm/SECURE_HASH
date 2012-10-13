@@ -178,52 +178,45 @@
     <transform xil_pn:end_ts="1349536988" xil_pn:in_ck="-792498512335207165" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="5552604459996853994" xil_pn:start_ts="1349536961">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.bld"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.ngd"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_ngdbuild.xrpt"/>
-      <outfile xil_pn:name="_ngo"/>
-      <outfile xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1349537466" xil_pn:in_ck="4283537103617546244" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="6094698697723550085" xil_pn:start_ts="1349536988">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.pcf"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_map.map"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_map.mrp"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_map.ncd"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_map.ngm"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_map.xrpt"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_summary.xml"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_usage.xml"/>
-      <outfile xil_pn:name="_xmsgs/map.xmsgs"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1349538125" xil_pn:in_ck="-4670416135123601507" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="832869163894192598" xil_pn:start_ts="1349537466">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.ncd"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.pad"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.par"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.ptwx"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.unroutes"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.xpi"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_pad.csv"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_pad.txt"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM_par.xrpt"/>
-      <outfile xil_pn:name="_xmsgs/par.xmsgs"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1349538125" xil_pn:in_ck="-1670377548602045568" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416185" xil_pn:start_ts="1349538075">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.twr"/>
-      <outfile xil_pn:name="SHA512_AXI4_STREAM.twx"/>
-      <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputRemoved"/>
+      <status xil_pn:value="OutputRemoved"/>
     </transform>
     <transform xil_pn:end_ts="1349510287" xil_pn:in_ck="6816223047688249748" xil_pn:name="TRAN_createTimingConstraints" xil_pn:start_ts="1349510219">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="InputAdded"/>
       <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="InputRemoved"/>
