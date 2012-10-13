@@ -103,6 +103,38 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <td align="right">1711[Mbit/sec]</td>
   </tr>
   <tr>
+    <th align="right" rowspan="4">CycloneIV</th>
+    <th align="right" rowspan="4">Auto</th>
+    <td align="right" rowspan="2">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">1018,2070</td>
+    <td align="right">111[MHz]</td>
+    <td align="right">711[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">1019,2077</td>
+    <td align="right">123[MHz]</td>
+    <td align="right">771[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">1190,2585</td>
+    <td align="right">77[MHz]</td>
+    <td align="right">961[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">1191,2588</td>
+    <td align="right">92[MHz]</td>
+    <td align="right">1135[Mbit/sec]</td>
+  </tr>
+  <tr>
     <th colspan="9">SHA-256 WORD=32bit BLOCK=512bit</th>
   </tr>
   <tr>
@@ -194,6 +226,45 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <td align="right">1763[Mbit/sec]</td>
   </tr>
   <tr>
+    <th align="right" rowspan="5">CycloneIV</th>
+    <th align="right" rowspan="5">Auto</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">64</td>
+    <td align="right">1334,3331</td>
+    <td align="right">104[MHz]</td>
+    <td align="right">832[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">65</td>
+    <td align="right">1336,3335</td>
+    <td align="right">119[MHz]</td>
+    <td align="right">937[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">68</td>
+    <td align="right">1441,3496</td>
+    <td align="right">127[MHz]</td>
+    <td align="right">953[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">32</td>
+    <td align="right">1504,4074</td>
+    <td align="right">65[MHz]</td>
+    <td align="right">1046[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">33</td>
+    <td align="right">1506,4087</td>
+    <td align="right">69[MHz]</td>
+    <td align="right">1070[Mbit/sec]</td>
+  </tr>
+  <tr>
     <th colspan="9">SHA-512 WORD=64bit BLOCK=1024bit</th>
   </tr>
   <tr>
@@ -283,6 +354,45 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
     <td align="right">3641,10429</td>
     <td align="right">95[MHz]</td>
     <td align="right">2379[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="5">CycloneIV</th>
+    <th align="right" rowspan="5">Auto</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">2627,7221</td>
+    <td align="right">81[MHz]</td>
+    <td align="right">1049[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">2628,7289</td>
+    <td align="right">102[MHz]</td>
+    <td align="right">1290[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">84</td>
+    <td align="right">2829,7649</td>
+    <td align="right">114[MHz]</td>
+    <td align="right">1385[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">2961,9132</td>
+    <td align="right">53[MHz]</td>
+    <td align="right">1354[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">2962,9156</td>
+    <td align="right">51[MHz]</td>
+    <td align="right">1287[Mbit/sec]</td>
   </tr>
 </table>
 

@@ -1,0 +1,7 @@
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../PipeWork/src/main/vhdl/components/reducer.vhd"      ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../PipeWork/src/main/vhdl/components/components.vhd"   ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../src/main/vhdl/sha1.vhd"         ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../src/main/vhdl/sha_schedule.vhd" ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../src/main/vhdl/sha_pre_proc.vhd" ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../src/main/vhdl/sha1_proc.vhd"    ]
+set_global_assignment -name VHDL_FILE -library PipeWork [file join $::quartus(qip_path) "../../../../src/main/vhdl/sha1_core.vhd"    ]
