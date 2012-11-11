@@ -36,75 +36,75 @@ sha512_test : $(SHA512_TEST_BENCH)
 clean:
 	rm -f *.o *.cf $(SHA1_TEST_BENCH) $(SHA256_TEST_BENCH) $(SHA512_TEST_BENCH)
 
-sha1_axi4_stream_test_bench_w1_s4_g0    : sha1_axi4_stream_test_bench.o DUT
+sha1_axi4_stream_test_bench_w1_s4_g0    : sha1_axi4_stream_test_bench.o DUT sha1_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_axi4_stream_test_bench_w1_s4_g1    : sha1_axi4_stream_test_bench.o DUT
+sha1_axi4_stream_test_bench_w1_s4_g1    : sha1_axi4_stream_test_bench.o DUT sha1_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_axi4_stream_test_bench_w1_s8_g0    : sha1_axi4_stream_test_bench.o DUT
+sha1_axi4_stream_test_bench_w1_s8_g0    : sha1_axi4_stream_test_bench.o DUT sha1_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_axi4_stream_test_bench_w2_s8_g0    : sha1_axi4_stream_test_bench.o DUT
+sha1_axi4_stream_test_bench_w2_s8_g0    : sha1_axi4_stream_test_bench.o DUT sha1_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha1_axi4_stream_test_bench_w4_s16_g0   : sha1_axi4_stream_test_bench.o DUT
+sha1_axi4_stream_test_bench_w4_s16_g0   : sha1_axi4_stream_test_bench.o DUT sha1_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w1_s4_g0  : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w1_s4_g0  : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w1_s4_g1  : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w1_s4_g1  : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w1_s4_g4  : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w1_s4_g4  : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w1_s8_g0  : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w1_s8_g0  : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w2_s8_g0  : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w2_s8_g0  : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha256_axi4_stream_test_bench_w4_s16_g0 : sha256_axi4_stream_test_bench.o DUT
+sha256_axi4_stream_test_bench_w4_s16_g0 : sha256_axi4_stream_test_bench.o DUT sha256_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w1_s4_g0  : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w1_s4_g0  : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w1_s4_g1  : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w1_s4_g1  : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w1_s8_g0  : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w1_s8_g0  : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w1_s8_g1  : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w1_s8_g1  : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w1_s8_g4  : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w1_s8_g4  : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w2_s16_g0 : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w2_s16_g0 : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
-sha512_axi4_stream_test_bench_w4_s32_g0 : sha512_axi4_stream_test_bench.o DUT
+sha512_axi4_stream_test_bench_w4_s32_g0 : sha512_axi4_stream_test_bench.o DUT sha512_test.snr
 	 $(GHDL) -e $(GHDLFLAGS) $@
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
@@ -118,14 +118,23 @@ sha512_axi4_stream_test_bench.o :  $(TOP)/src/examples/vhdl/sha512_axi4_stream_t
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 
-sha1_axi4_stream.o         :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o
+sha1_axi4_stream.o              :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-sha256_axi4_stream.o       :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o
+sha256_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-sha512_axi4_stream.o       :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o
+sha512_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+
+sha1_test.snr                   :  $(TOP)/src/examples/scenarios/sha1_test.snr
+	cp $< .
+
+sha256_test.snr                 : $(TOP)/src/examples/scenarios/sha256_test.snr
+	cp $< .
+
+sha512_test.snr                 : $(TOP)/src/examples/scenarios/sha512_test.snr
+	cp $< .
 
 
 DUT            : sha_pre_proc.o sha_schedule.o      \
@@ -186,3 +195,4 @@ components.o   :  $(TOP)/PipeWork/src/main/vhdl/components/components.vhd
 
 reducer.o      :  $(TOP)/PipeWork/src/main/vhdl/components/reducer.vhd
 	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+
