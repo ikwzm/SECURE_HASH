@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256_axi4_stream.vhd
 --!     @brief   SHA-256 AXI4-Stream Wrapper
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.7.1
+--!     @date    2012/11/11
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -108,6 +108,7 @@ use     PipeWork.SHA256.HASH_BITS;
 architecture RTL of SHA256_AXI4_STREAM is
     constant BYTE_BITS : integer   := 8;
     constant WORD_BITS : integer   := 32;
+    constant HASH_BYTES: integer   := (HASH_BITS/BYTE_BITS);
     constant O_WIDTH   : integer   := (BYTE_BITS*O_BYTES)/WORD_BITS;
     signal   reset     : std_logic;
     constant clear     : std_logic := '0';
@@ -115,9 +116,10 @@ architecture RTL of SHA256_AXI4_STREAM is
     constant o_start   : std_logic := '0';
     constant o_done    : std_logic := '0';
     constant o_flush   : std_logic := '0';
-    constant o_offset  : std_logic_vector(O_WIDTH-1 downto 0) := (others => '0');
-    constant d_strobe  : std_logic_vector((HASH_BITS/BYTE_BITS)-1 downto 0) := (others => '1');
-    signal   d_word    : std_logic_vector((HASH_BITS          )-1 downto 0);
+    constant o_offset  : std_logic_vector(O_WIDTH   -1 downto 0) := (others => '0');
+    constant d_strobe  : std_logic_vector(HASH_BYTES-1 downto 0) := (others => '1');
+    signal   d_hash    : std_logic_vector(HASH_BITS -1 downto 0);
+    signal   d_word    : std_logic_vector(HASH_BITS -1 downto 0);
     signal   d_valid   : std_logic;
     signal   d_ready   : std_logic;
 begin
@@ -143,10 +145,17 @@ begin
             I_LAST      => I_LAST               , -- In  :
             I_VAL       => I_VALID              , -- In  :
             I_RDY       => I_READY              , -- Out :
-            O_DATA      => d_word               , -- Out :
+            O_DATA      => d_hash               , -- Out :
             O_VAL       => d_valid              , -- Out :
             O_RDY       => d_ready                -- In  :
         );
+    -------------------------------------------------------------------------------
+    -- MSB->LSBに変換.
+    -------------------------------------------------------------------------------
+    REVS: for i in 0 to HASH_BYTES-1 generate
+        d_word(BYTE_BITS*(i+1)-1 downto BYTE_BITS*i) <=
+            d_hash(BYTE_BITS*(HASH_BYTES-1-i+1)-1 downto BYTE_BITS*(HASH_BYTES-1-i));
+    end generate;
     -------------------------------------------------------------------------------
     -- 入力バッファ.
     -------------------------------------------------------------------------------
@@ -156,7 +165,7 @@ begin
             ENBL_BITS   => WORD_BITS/BYTE_BITS  , -- I_ENAはシンボル毎に4ビット.
             I_WIDTH     => HASH_BITS/WORD_BITS  , -- 入力側のシンボル数.
             O_WIDTH     => O_WIDTH              , -- 出力側のシンボル数.
-            QUEUE_SIZE  => 0                    , -- 
+            QUEUE_SIZE  => 0                    ,
             VALID_MIN   => 0                    , -- ibuf_word_validの範囲の最小値.
             VALID_MAX   => 0                    , -- ibuf_word_validの範囲の最大値.
             I_JUSTIFIED => 1                    , -- 入力シンボルはLSB側に詰められている.
