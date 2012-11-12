@@ -451,6 +451,15 @@ begin
             string'("0xcbcd56593e478bd3b8bbb476d2260d8bbf39d59f1e418a7daed062f90492d651c7bd21ff8a65262fe4f26b6208ec9d8c2a0c7fb7e0b70550af9fee6b91c46067")
         );
         ---------------------------------------------------------------------------
+        -- WORD=4 かつメッセージの長さが111byte の場合に間違った値を生成するのを再現
+        ---------------------------------------------------------------------------
+        SCENARIO <= "5.0.1";
+        wait for 0 ns;
+        RUN_TEST_ONE(
+            string'("edidylhxlsypvwwaafiYimxhiiaptmlpemealzcwgn1jxvyqwmvszunhseidyknrujxcoxptooylv^gomfitvsdInpudpxjes2qcndjlmlndctv"),
+            string'("0x92501e2f58ce6d167d258c557a3db5e2d1c74c13c32afe0be05abe8cd6841ae6837966b463c683f506c183303fc659b446cb84a59aa8efd37c5165c17e0e4924")
+        );
+        ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------
         WAIT_CLK(10); 
