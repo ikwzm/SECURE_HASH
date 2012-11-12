@@ -2,7 +2,7 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.2.1
+--!     @version 0.2.2
 --!     @date    2012/11/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
@@ -317,10 +317,6 @@ begin
             padding_done := FALSE;
             out_sym_size := FALSE;
             for i in ibuf_word_valid'low to ibuf_word_valid'high loop
-                if (WORDS > 2 and padding_done and ibuf_word_valid(i) = '0' and
-                    ibuf_word_valid'high - i >= symbol_size'length/SYMBOL_BITS) then
-                    out_sym_size := TRUE;
-                end if;
                 if (ibuf_word_valid(i) = '1') then
                     in_data(SYMBOL_BITS*(i+1)-1 downto SYMBOL_BITS*i) :=
                         ibuf_word_data(SYMBOL_BITS*(i+1)-1 downto SYMBOL_BITS*i);
@@ -338,6 +334,10 @@ begin
                     in_data(SYMBOL_BITS*(i+1)-1 downto SYMBOL_BITS*i) := PADDING_SYMBOL;
                     prev_valid   := FALSE;
                     padding_done := TRUE;
+                end if;
+                if (WORDS > 2 and padding_done and ibuf_word_valid(i) = '0' and
+                    ibuf_word_valid'high - i >= symbol_size'length/SYMBOL_BITS) then
+                    out_sym_size := TRUE;
                 end if;
             end loop;
         else
