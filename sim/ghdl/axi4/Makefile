@@ -118,13 +118,13 @@ sha512_axi4_stream_test_bench.o :  $(TOP)/src/examples/vhdl/sha512_axi4_stream_t
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 
-sha1_axi4_stream.o              :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o
+sha1_axi4_stream.o              :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o    PipeWork
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-sha256_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o
+sha256_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o  PipeWork
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
-sha512_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o
+sha512_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o  PipeWork
 	$(GHDL) -a $(GHDLFLAGS) --work=work $<
 
 sha1_test.snr                   :  $(TOP)/src/examples/scenarios/sha1_test.snr
