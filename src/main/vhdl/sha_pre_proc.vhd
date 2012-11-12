@@ -2,8 +2,8 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.2.0
---!     @date    2012/9/26
+--!     @version 0.2.1
+--!     @date    2012/11/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -450,7 +450,7 @@ begin
                             out_done   <= '1';
                             out_valid  <= ibuf_valid;
                             next_state <= INPUT_STATE;
-                        elsif (remain_out_size = 1 and padding_done) then
+                        elsif (remain_out_size = 1) then
                             out_data   := in_data;
                             out_done   <= '0';
                             out_valid  <= ibuf_valid;
