@@ -2,8 +2,8 @@
 --!     @file    sha256.vhd
 --!     @brief   SHA-256 Package :
 --!              SHA-256用各種定義パッケージ.
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.7.2
+--!     @date    2012/11/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -351,16 +351,16 @@ package body SHA256 is
     -------------------------------------------------------------------------------
     function  RotR(X:WORD_TYPE;N:integer) return WORD_TYPE is
     begin
-        return X(WORD_TYPE'low+N-1 downto WORD_TYPE'low  ) &
-               X(WORD_TYPE'high    downto WORD_TYPE'low+N);
+        return WORD_TYPE'(X(WORD_TYPE'low+N-1 downto WORD_TYPE'low  ) &
+                          X(WORD_TYPE'high    downto WORD_TYPE'low+N));
     end function;
     -------------------------------------------------------------------------------
     -- シフト演算関数.
     -------------------------------------------------------------------------------
     function  SftR(X:WORD_TYPE;N:integer) return WORD_TYPE is
     begin
-        return  (WORD_TYPE'low+N-1 downto WORD_TYPE'low => '0') & 
-               X(WORD_TYPE'high    downto WORD_TYPE'low+N);
+        return WORD_TYPE'( (WORD_TYPE'low+N-1 downto WORD_TYPE'low => '0') & 
+                          X(WORD_TYPE'high    downto WORD_TYPE'low+N));
     end function;
     -------------------------------------------------------------------------------
     -- 
