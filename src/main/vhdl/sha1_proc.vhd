@@ -2,8 +2,8 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.8.0
+--!     @date    2012/11/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

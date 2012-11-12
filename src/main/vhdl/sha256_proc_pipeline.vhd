@@ -2,8 +2,8 @@
 --!     @file    sha256_proc_pipeline.vhd
 --!     @brief   SHA-256 Processing Module :
 --!              SHA-256用計算モジュール(パイプライン版).
---!     @version 0.7.1
---!     @date    2012/10/13
+--!     @version 0.8.0
+--!     @date    2012/11/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

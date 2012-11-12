@@ -2,8 +2,8 @@
 --!     @file    sha512.vhd
 --!     @brief   SHA-512 Package :
 --!              SHA-512用各種定義パッケージ.
---!     @version 0.7.2
---!     @date    2012/11/12
+--!     @version 0.8.0
+--!     @date    2012/11/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

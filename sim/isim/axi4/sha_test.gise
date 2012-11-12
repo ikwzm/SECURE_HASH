@@ -38,9 +38,7 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_XML_REPORT" xil_pn:name="SHA1.twx" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="SHA1.unroutes" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="SHA1.xst"/>
-    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_isim_beh.exe"/>
-    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_isim_beh.wdb"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA1_TEST_BENCH_W1_S4_isim_beh.exe"/>
     <file xil_pn:fileType="FILE_HTML" xil_pn:name="SHA1_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="SHA1_guide.ncd" xil_pn:origination="imported"/>
@@ -69,8 +67,12 @@
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="SHA256.unroutes" xil_pn:subbranch="Par"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="SHA256.xst"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G1_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_beh.prj"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_isim_beh.exe"/>
+    <file xil_pn:fileType="FILE_ISIM_MISC" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_isim_beh.wdb"/>
     <file xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_stx_beh.prj"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W2_S8_G0_isim_beh.exe"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_ISIM_EXE" xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W4_S16_G0_isim_beh.exe"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGDBUILD_LOG" xil_pn:name="SHA256_SAMPLE.bld"/>
     <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="SHA256_SAMPLE.cmd_log"/>
     <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="SHA256_SAMPLE.lso"/>
@@ -197,9 +199,13 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1352615875" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1352615875">
+    <transform xil_pn:end_ts="1352633214" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_copyAbstractToPostAbstractSimulation" xil_pn:start_ts="1352633213">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_core.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_models.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_stream_master_player.vhd"/>
@@ -236,11 +242,11 @@
       <outfile xil_pn:name="../../../src/main/vhdl/sha_pre_proc.vhd"/>
       <outfile xil_pn:name="../../../src/main/vhdl/sha_schedule.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1352616782" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="-4610986078792579030" xil_pn:start_ts="1352616782">
+    <transform xil_pn:end_ts="1352633780" xil_pn:name="TRAN_xawsToSimhdl" xil_pn:prop_ck="7051494592498953941" xil_pn:start_ts="1352633780">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1352616782" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="1934024137829281960" xil_pn:start_ts="1352616782">
+    <transform xil_pn:end_ts="1352633780" xil_pn:name="TRAN_schematicsToHdlSim" xil_pn:prop_ck="8102241632660704595" xil_pn:start_ts="1352633780">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
@@ -248,9 +254,14 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1352615876" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1352615875">
+    <transform xil_pn:end_ts="1352633214" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_copyPostAbstractToPreSimulation" xil_pn:start_ts="1352633214">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_core.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_models.vhd"/>
       <outfile xil_pn:name="../../../Dummy_Plug/src/main/vhdl/axi4/axi4_stream_master_player.vhd"/>
@@ -287,24 +298,28 @@
       <outfile xil_pn:name="../../../src/main/vhdl/sha_pre_proc.vhd"/>
       <outfile xil_pn:name="../../../src/main/vhdl/sha_schedule.vhd"/>
     </transform>
-    <transform xil_pn:end_ts="1352616801" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="837050935318391219" xil_pn:start_ts="1352616782">
+    <transform xil_pn:end_ts="1352633804" xil_pn:in_ck="-1120943154553231424" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="-7271289633770551959" xil_pn:start_ts="1352633780">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForInputs"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="InputChanged"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_beh.prj"/>
-      <outfile xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_isim_beh.exe"/>
+      <outfile xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_beh.prj"/>
+      <outfile xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
       <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1352616802" xil_pn:in_ck="-1322370444655470662" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-423361555439605184" xil_pn:start_ts="1352616801">
+    <transform xil_pn:end_ts="1352633805" xil_pn:in_ck="-2350045948201287418" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="6896811038749548758" xil_pn:start_ts="1352633804">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
       <status xil_pn:value="OutputChanged"/>
-      <outfile xil_pn:name="SHA1_AXI4_STREAM_TEST_BENCH_W2_S8_G0_isim_beh.wdb"/>
+      <outfile xil_pn:name="SHA256_AXI4_STREAM_TEST_BENCH_W1_S4_G4_isim_beh.wdb"/>
       <outfile xil_pn:name="isim.cmd"/>
       <outfile xil_pn:name="isim.log"/>
     </transform>

@@ -2,8 +2,8 @@
 --!     @file    sha256_proc_simple.vhd
 --!     @brief   SHA-256 Processing Module :
 --!              SHA-256用計算モジュール(シンプル版).
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.8.0
+--!     @date    2012/11/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

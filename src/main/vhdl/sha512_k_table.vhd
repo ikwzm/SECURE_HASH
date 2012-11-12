@@ -2,8 +2,8 @@
 --!     @file    sha512_k_table.vhd
 --!     @brief   SHA-512 Calculation K Table
 --!              SHA-512 K TABLE
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.8.0
+--!     @date    2012/11/13
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
