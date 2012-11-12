@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_test_bench.vhd
 --!     @brief   SHA-1 TEST BENCH :
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.7.1
+--!     @date    2012/11/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -248,6 +248,23 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
+        procedure RUN_TEST_ONE(MES,EXP:STRING) is
+            variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
+            variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
+            variable  str_len    : integer;
+            variable  run_time   : integer;
+        begin
+            message := STRING_TO_SYMBOL_VECTOR(MES);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => EXP, 
+                VAL     => exp_digest,
+                STR_LEN => str_len
+            );
+            RUN_TEST(message, 1, 0, TRUE, FALSE, exp_digest);
+        end procedure;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
         procedure RUN_TEST_ALL(CNT:integer;MES,EXP:STRING) is
             variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
             variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
@@ -324,6 +341,13 @@ begin
         RUN_TEST_ALL(10,
                      string'("0123456701234567012345670123456701234567012345670123456701234567"),
                      string'("0xDEA356A2CDDD90C7A7ECEDC5EBB563934F460452"));
+        ---------------------------------------------------------------------------
+        -- WORD=4 かつメッセージの長さが48byte の場合に間違った値を生成するのを再現
+        ---------------------------------------------------------------------------
+        SCENARIO <= "5.0.0";
+        wait for 0 ns;
+        RUN_TEST_ONE(string'("9xechjlnzwiesrptcUrfp)kgxgughsfucsKnusuojkazva5l"),
+                     string'("0x970a78cc84b23d4c4d36e6a13722a65448c6e820"));
         ---------------------------------------------------------------------------
         -- シミュレーション終了
         ---------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha512_test_bench.vhd
 --!     @brief   SHA-512 TEST BENCH :
---!     @version 0.7.0
---!     @date    2012/10/6
+--!     @version 0.7.1
+--!     @date    2012/11/12
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -266,6 +266,24 @@ begin
         ---------------------------------------------------------------------------
         -- 
         ---------------------------------------------------------------------------
+        procedure RUN_TEST_ONE(MES,EXP:STRING) is
+            variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
+            variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
+            variable  str_len    : integer;
+            variable  run_time   : integer;
+            variable  wait_cycle : CYCLE_VECTOR(0 to 15) := (others => 0);
+        begin
+            message := STRING_TO_SYMBOL_VECTOR(MES);
+            STRING_TO_STD_LOGIC_VECTOR(
+                STR     => EXP, 
+                VAL     => exp_digest,
+                STR_LEN => str_len
+            );
+            RUN_TEST(message, wait_cycle, 1, 0, TRUE, FALSE, exp_digest);
+        end procedure;
+        ---------------------------------------------------------------------------
+        -- 
+        ---------------------------------------------------------------------------
         procedure RUN_TEST_OFFSET(CNT:integer;MES,EXP:STRING) is
             variable  message    : SYMBOL_VECTOR(0 to MES'length-1);
             variable  exp_digest : std_logic_vector(HASH_BITS-1 downto 0);
@@ -422,6 +440,15 @@ begin
             10,
             string'("0123456701234567012345670123456701234567012345670123456701234567"),
             string'("0x89d05ba632c699c31231ded4ffc127d5a894dad412c0e024db872d1abd2ba8141a0f85072a9be1e2aa04cf33c765cb510813a39cd5a84c4acaa64d3f3fb7bae9")
+        );
+        ---------------------------------------------------------------------------
+        -- WORD=4 かつメッセージの長さが96byte の場合に間違った値を生成するのを再現
+        ---------------------------------------------------------------------------
+        SCENARIO <= "5.0.0";
+        wait for 0 ns;
+        RUN_TEST_ONE(
+            string'("nouEpxccaznytbvlrgbleyqe7utsidtvdnxacpskvfxxxcqfdoAfkguqqpysmbnwaKyxsahvvmhfpmifgm4jyaoernufbkmh"),
+            string'("0xcbcd56593e478bd3b8bbb476d2260d8bbf39d59f1e418a7daed062f90492d651c7bd21ff8a65262fe4f26b6208ec9d8c2a0c7fb7e0b70550af9fee6b91c46067")
         );
         ---------------------------------------------------------------------------
         -- シミュレーション終了
