@@ -1,5 +1,5 @@
-SHA-1,SHA-256,SHA-512 Digest Generator VHDL RTL.
-------------------------------------------------
+SHA-1,SHA-256,SHA-512 Secure Hash Generator VHDL RTL.
+-----------------------------------------------------
 
 ###概要###
 SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールです.
@@ -8,20 +8,17 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
 
 １クロックで１、２ワード(１ワードはSHA-1およびSHA-256で32bit、SHA-512では64bit)処理できます.
 
-###論理合成###
-
-
-####他に必要なファイル####
-論理合成を行うためには次のファイルが必要です.
-
-* PipeWorkのコンポーネント宣言パッケージ   components.vhd (<https://github.com/ikwzm/PipeWork.git>)
-* 異なるデータ幅のパスを継ぐためのアダプタ reducer.vhd    (<https://github.com/ikwzm/PipeWork.git>)
-
 ####開発環境####
 以下の開発環境で合成出来ることを確認しています.
 
 * Xilinx ISE14.2
 * Altera QuartusII 11.1sp2 Web Edition(32bit)
+
+###論理合成###
+
+fpga/xilinx/ise14.2 の下に Xilinx 社FPGA用の各プロジェクトがあります.
+fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成するスクリプトがあります.
+
 
 ####論理合成の結果####
 
@@ -513,8 +510,6 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
 ####他に必要なファイル####
 シミュレーションをするためには次のファイルが必要です。
 
-* PipeWorkのコンポーネント宣言パッケージ   components.vhd (<https://github.com/ikwzm/PipeWork.git>)
-* 異なるデータ幅のパスを継ぐためのアダプタ reducer.vhd    (<https://github.com/ikwzm/PipeWork.git>)
 * 文字列操作用の各種ユーティリティ         util.vhd       (<https://github.com/ikwzm/Dummy_Plug.git>)
 
 ####GHDLによるシミュレーション####
