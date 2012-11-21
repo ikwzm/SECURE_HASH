@@ -16,7 +16,7 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
 
 ###論理合成###
 
-fpga/xilinx/ise14.2 の下に Xilinx 社FPGA用の各プロジェクトがあります.
+fpga/xilinx/ise14.2 の下に Xilinx 社FPGA用の各プロジェクトがあります.    
 fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成するスクリプトがあります.
 
 
