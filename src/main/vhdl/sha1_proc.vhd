@@ -2,8 +2,8 @@
 --!     @file    sha1_proc.vhd
 --!     @brief   SHA-1 Processing Module :
 --!              SHA-1用計算モジュール.
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/12/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA1.WORD_BITS;
-use     PipeWork.SHA1.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA1.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA1.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA1_PROC :
 --!          SHA-1用計算モジュール.
@@ -104,8 +104,8 @@ end SHA1_PROC;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA1.all;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA1.all;
 architecture RTL of SHA1_PROC is
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値

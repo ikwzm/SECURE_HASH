@@ -1,6 +1,6 @@
 GHDL=ghdl
-GHDLFLAGS=--mb-comments -P$(TOP)/Dummy_Plug/sim/ghdl/dummy_plug 
-WORK=work
+GHDLFLAGS=--mb-comments -P$(TOP)/Dummy_Plug/sim/ghdl/dummy_plug --work=IKWZM_SECURE_HASH
+WORK=IKWZM_SECURE_HASH
 TOP=../../..
 
 SHA1_TEST_BENCH   = sha1_axi4_stream_test_bench_w1_s4_g0    \
@@ -109,23 +109,23 @@ sha512_axi4_stream_test_bench_w4_s32_g0 : sha512_axi4_stream_test_bench.o DUT sh
 	-$(GHDL) -r $(GHDLRUNFLAGS) $@
 
 sha1_axi4_stream_test_bench.o   :  $(TOP)/src/examples/vhdl/sha1_axi4_stream_test_bench.vhd   sha1_axi4_stream.o
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256_axi4_stream_test_bench.o :  $(TOP)/src/examples/vhdl/sha256_axi4_stream_test_bench.vhd sha256_axi4_stream.o
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512_axi4_stream_test_bench.o :  $(TOP)/src/examples/vhdl/sha512_axi4_stream_test_bench.vhd sha512_axi4_stream.o
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 
-sha1_axi4_stream.o              :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o    PipeWork
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+sha1_axi4_stream.o              :  $(TOP)/src/examples/vhdl/sha1_axi4_stream.vhd   sha1.o   reducer.o
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
-sha256_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o  PipeWork
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+sha256_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha256_axi4_stream.vhd sha256.o reducer.o
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
-sha512_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o  PipeWork
-	$(GHDL) -a $(GHDLFLAGS) --work=work $<
+sha512_axi4_stream.o            :  $(TOP)/src/examples/vhdl/sha512_axi4_stream.vhd sha512.o reducer.o
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha1_test.snr                   :  $(TOP)/src/examples/scenarios/sha1_test.snr
 	cp $< .
@@ -137,62 +137,57 @@ sha512_test.snr                 : $(TOP)/src/examples/scenarios/sha512_test.snr
 	cp $< .
 
 
-DUT            : sha_pre_proc.o sha_schedule.o      \
-                 sha1.o   sha1_core.o   sha1_proc.o \
+DUT            : sha_pre_proc.o sha_schedule.o reducer.o  \
+                 sha1.o   sha1_core.o   sha1_proc.o       \
                  sha256.o sha256_core.o sha256_k_table.o sha256_proc_simple.o sha256_proc_pipeline.o \
                  sha512.o sha512_core.o sha512_k_table.o sha512_proc_simple.o sha512_proc_pipeline.o \
                  $(END_LIST)
 
 sha1.o                  :  $(TOP)/src/main/vhdl/sha1.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha1_core.o             :  $(TOP)/src/main/vhdl/sha1_core.vhd            sha1.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha1_proc.o             :  $(TOP)/src/main/vhdl/sha1_proc.vhd            sha1.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256.o                :  $(TOP)/src/main/vhdl/sha256.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256_core.o           :  $(TOP)/src/main/vhdl/sha256_core.vhd          sha256.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256_proc_simple.o    :  $(TOP)/src/main/vhdl/sha256_proc_simple.vhd   sha256.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256_proc_pipeline.o  :  $(TOP)/src/main/vhdl/sha256_proc_pipeline.vhd sha256.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha256_k_table.o        :  $(TOP)/src/main/vhdl/sha256_k_table.vhd       sha256.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512.o                :  $(TOP)/src/main/vhdl/sha512.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512_core.o           :  $(TOP)/src/main/vhdl/sha512_core.vhd          sha512.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512_proc_simple.o    :  $(TOP)/src/main/vhdl/sha512_proc_simple.vhd   sha512.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512_proc_pipeline.o  :  $(TOP)/src/main/vhdl/sha512_proc_pipeline.vhd sha512.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha512_k_table.o        :  $(TOP)/src/main/vhdl/sha512_k_table.vhd       sha512.o
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
-sha_pre_proc.o          :  $(TOP)/src/main/vhdl/sha_pre_proc.vhd         PipeWork
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+sha_pre_proc.o          :  $(TOP)/src/main/vhdl/sha_pre_proc.vhd         reducer.o
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
 sha_schedule.o          :  $(TOP)/src/main/vhdl/sha_schedule.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 
-PipeWork       : reducer.o components.o
-
-components.o   :  $(TOP)/PipeWork/src/main/vhdl/components/components.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
-
-reducer.o      :  $(TOP)/PipeWork/src/main/vhdl/components/reducer.vhd
-	$(GHDL) -a $(GHDLFLAGS) --work=PipeWork $<
+reducer.o               :  $(TOP)/src/main/vhdl/reducer.vhd
+	$(GHDL) -a $(GHDLFLAGS) --work=IKWZM_SECURE_HASH $<
 

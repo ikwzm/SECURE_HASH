@@ -2,8 +2,8 @@
 --!     @file    sha512_k_table.vhd
 --!     @brief   SHA-512 Calculation K Table
 --!              SHA-512 K TABLE
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA512.WORD_BITS;
-use     PipeWork.SHA512.ROUNDS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA512.ROUNDS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA512_K_TABLE :
 --!          SHA-512用K(t)テーブル.
@@ -61,10 +61,10 @@ end SHA512_K_TABLE;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA512.WORD_BITS;
-use     PipeWork.SHA512.ROUNDS;
-use     PipeWork.SHA512.K_TABLE;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA512.ROUNDS;
+use     IKWZM_SECURE_HASH.SHA512.K_TABLE;
 architecture RTL of SHA512_K_TABLE is
 begin
     process (CLK, RST) begin

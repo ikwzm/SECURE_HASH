@@ -2,8 +2,8 @@
 --!     @file    sha256_proc_pipeline.vhd
 --!     @brief   SHA-256 Processing Module :
 --!              SHA-256用計算モジュール(パイプライン版).
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA256.WORD_BITS;
-use     PipeWork.SHA256.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA256.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA256.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA256_PROC_PIPELINE :
 --!          SHA-256用計算モジュール(パイプライン版).
@@ -91,8 +91,8 @@ end SHA256_PROC_PIPELINE;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA256.all;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA256.all;
 architecture RTL of SHA256_PROC_PIPELINE is
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値

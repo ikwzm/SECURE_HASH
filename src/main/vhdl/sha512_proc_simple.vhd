@@ -2,8 +2,8 @@
 --!     @file    sha512_proc_simple.vhd
 --!     @brief   SHA-512 Processing Module :
 --!              SHA-512用計算モジュール(シンプル版).
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -37,9 +37,9 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA512.WORD_BITS;
-use     PipeWork.SHA512.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA512.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA512_PROC_SIMPLE :
 --!          SHA-512用計算モジュール(シンプル版).
@@ -104,8 +104,8 @@ end SHA512_PROC_SIMPLE;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA512.all;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.all;
 architecture RTL of SHA512_PROC_SIMPLE is
     -------------------------------------------------------------------------------
     -- カウンタ(NUM)の最大値

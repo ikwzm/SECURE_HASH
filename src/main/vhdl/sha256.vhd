@@ -2,8 +2,8 @@
 --!     @file    sha256.vhd
 --!     @brief   SHA-256 Package :
 --!              SHA-256用各種定義パッケージ.
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.0.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

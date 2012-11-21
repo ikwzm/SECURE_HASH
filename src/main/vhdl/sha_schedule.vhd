@@ -2,8 +2,8 @@
 --!     @file    sha_schedule.vhd
 --!     @brief   SHA-1/2 Prepare the Message Schedule Module.
 --!              SHA-1/2 用スケジュールモジュール.
---!     @version 0.6.0
---!     @date    2012/9/30
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --

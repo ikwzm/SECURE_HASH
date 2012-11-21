@@ -179,6 +179,7 @@
     <file xil_pn:fileType="FILE_LOG" xil_pn:name="fuse.log"/>
     <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="isim"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_CMD" xil_pn:name="isim.cmd"/>
+    <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_LOG" xil_pn:name="isim.log"/>
     <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="webtalk_pn.xml"/>
     <file xil_pn:branch="BehavioralSim" xil_pn:fileType="FILE_INI" xil_pn:name="xilinxsim.ini"/>
     <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xlnx_auto_0_xdb"/>
@@ -210,16 +211,19 @@
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
     </transform>
-    <transform xil_pn:end_ts="1352598686" xil_pn:in_ck="3631423951888132462" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="1865157749455962217" xil_pn:start_ts="1352598669">
+    <transform xil_pn:end_ts="1353406325" xil_pn:in_ck="5351457121548645029" xil_pn:name="TRAN_ISimulateBehavioralModelRunFuse" xil_pn:prop_ck="1865157749455962217" xil_pn:start_ts="1353406306">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
       <outfile xil_pn:name="SHA256_TEST_BENCH_W1_S4_G4_beh.prj"/>
       <outfile xil_pn:name="SHA256_TEST_BENCH_W1_S4_G4_isim_beh.exe"/>
       <outfile xil_pn:name="fuse.log"/>
       <outfile xil_pn:name="isim"/>
+      <outfile xil_pn:name="isim.log"/>
       <outfile xil_pn:name="xilinxsim.ini"/>
     </transform>
-    <transform xil_pn:end_ts="1352598687" xil_pn:in_ck="4741139394737962328" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-4266070075757210282" xil_pn:start_ts="1352598686">
+    <transform xil_pn:end_ts="1353406326" xil_pn:in_ck="4741139394737962328" xil_pn:name="TRAN_ISimulateBehavioralModel" xil_pn:prop_ck="-4266070075757210282" xil_pn:start_ts="1353406325">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
@@ -285,7 +289,7 @@
     </transform>
     <transform xil_pn:end_ts="1349469404" xil_pn:in_ck="-4967351232487653432" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="-5132073390456909008" xil_pn:start_ts="1349469386">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
+      <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForProperties"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
@@ -295,7 +299,7 @@
     </transform>
     <transform xil_pn:end_ts="1349469537" xil_pn:in_ck="8898214528206320685" xil_pn:name="TRANEXT_map_spartan6" xil_pn:prop_ck="6094698697723550085" xil_pn:start_ts="1349469404">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
+      <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
@@ -305,7 +309,7 @@
     <transform xil_pn:end_ts="1349469684" xil_pn:in_ck="8703231465860288182" xil_pn:name="TRANEXT_par_spartan6" xil_pn:prop_ck="832869163894192598" xil_pn:start_ts="1349469537">
       <status xil_pn:value="SuccessfullyRun"/>
       <status xil_pn:value="WarningsGenerated"/>
-      <status xil_pn:value="NotReadyToRun"/>
+      <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
@@ -314,7 +318,7 @@
     </transform>
     <transform xil_pn:end_ts="1349469752" xil_pn:in_ck="-1659167731245858430" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416185" xil_pn:start_ts="1349469728">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
+      <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="OutOfDateForOutputs"/>
@@ -323,7 +327,7 @@
     </transform>
     <transform xil_pn:name="TRAN_createTimingConstraints">
       <status xil_pn:value="SuccessfullyRun"/>
-      <status xil_pn:value="NotReadyToRun"/>
+      <status xil_pn:value="ReadyToRun"/>
       <status xil_pn:value="OutOfDateForInputs"/>
       <status xil_pn:value="OutOfDateForPredecessor"/>
       <status xil_pn:value="InputChanged"/>

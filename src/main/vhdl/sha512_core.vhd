@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha512_core.vhd
 --!     @brief   SHA-512 CORE MODULE :
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -36,8 +36,8 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA512.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA-512 計算モジュール.
 -----------------------------------------------------------------------------------
@@ -107,11 +107,11 @@ end SHA512_CORE;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA512.WORD_BITS;
-use     PipeWork.SHA512.SHA_PRE_PROC;
-use     PipeWork.SHA512.SHA512_PROC_SIMPLE;
-use     PipeWork.SHA512.SHA512_PROC_PIPELINE;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA512.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA512.SHA_PRE_PROC;
+use     IKWZM_SECURE_HASH.SHA512.SHA512_PROC_SIMPLE;
+use     IKWZM_SECURE_HASH.SHA512.SHA512_PROC_PIPELINE;
 architecture RTL of SHA512_CORE is
     -------------------------------------------------------------------------------
     -- 内部信号

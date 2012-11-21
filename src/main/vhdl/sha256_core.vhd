@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256_core.vhd
 --!     @brief   SHA-256 CORE MODULE :
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -36,8 +36,8 @@
 -----------------------------------------------------------------------------------
 library ieee;
 use     ieee.std_logic_1164.all;
-library PipeWork;
-use     PipeWork.SHA256.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA256.HASH_BITS;
 -----------------------------------------------------------------------------------
 --! @brief   SHA-256 計算モジュール.
 -----------------------------------------------------------------------------------
@@ -107,11 +107,11 @@ end SHA256_CORE;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.SHA256.WORD_BITS;
-use     PipeWork.SHA256.SHA_PRE_PROC;
-use     PipeWork.SHA256.SHA256_PROC_SIMPLE;
-use     PipeWork.SHA256.SHA256_PROC_PIPELINE;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA256.WORD_BITS;
+use     IKWZM_SECURE_HASH.SHA256.SHA_PRE_PROC;
+use     IKWZM_SECURE_HASH.SHA256.SHA256_PROC_SIMPLE;
+use     IKWZM_SECURE_HASH.SHA256.SHA256_PROC_PIPELINE;
 architecture RTL of SHA256_CORE is
     -------------------------------------------------------------------------------
     -- 内部信号

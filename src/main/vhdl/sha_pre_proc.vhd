@@ -2,8 +2,8 @@
 --!     @file    sha_pre_proc.vhd
 --!     @brief   SHA-1/2 Pre Processing Module :
 --!              SHA-1/2用プリプロセッシングモジュール.
---!     @version 0.2.2
---!     @date    2012/11/12
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -109,8 +109,6 @@ end SHA_PRE_PROC;
 library ieee;
 use     ieee.std_logic_1164.all;
 use     ieee.numeric_std.all;
-library PipeWork;
-use     PipeWork.Components.REDUCER;
 architecture RTL of SHA_PRE_PROC is
     -------------------------------------------------------------------------------
     -- １ブロックのビット数
@@ -192,6 +190,45 @@ architecture RTL of SHA_PRE_PROC is
         end loop;
         return o_vec;
     end function;
+    -------------------------------------------------------------------------------
+    -- REDUCERのコンポーネント宣言 
+    -------------------------------------------------------------------------------
+    component REDUCER
+        generic (
+            WORD_BITS   : integer := 8;
+            ENBL_BITS   : integer := 1;
+            I_WIDTH     : integer := 4;
+            O_WIDTH     : integer := 4;
+            QUEUE_SIZE  : integer := 0;
+            VALID_MIN   : integer := 0;
+            VALID_MAX   : integer := 0;
+            I_JUSTIFIED : integer := 0;
+            FLUSH_ENABLE: integer := 1
+        );
+        port (
+            CLK         : in  std_logic; 
+            RST         : in  std_logic;
+            CLR         : in  std_logic;
+            START       : in  std_logic;
+            OFFSET      : in  std_logic_vector(O_WIDTH-1 downto 0);
+            DONE        : in  std_logic;
+            FLUSH       : in  std_logic;
+            BUSY        : out std_logic;
+            VALID       : out std_logic_vector(VALID_MAX downto VALID_MIN);
+            I_DATA      : in  std_logic_vector(I_WIDTH*WORD_BITS-1 downto 0);
+            I_ENBL      : in  std_logic_vector(I_WIDTH*ENBL_BITS-1 downto 0);
+            I_DONE      : in  std_logic;
+            I_FLUSH     : in  std_logic;
+            I_VAL       : in  std_logic;
+            I_RDY       : out std_logic;
+            O_DATA      : out std_logic_vector(O_WIDTH*WORD_BITS-1 downto 0);
+            O_ENBL      : out std_logic_vector(O_WIDTH*ENBL_BITS-1 downto 0);
+            O_DONE      : out std_logic;
+            O_FLUSH     : out std_logic;
+            O_VAL       : out std_logic;
+            O_RDY       : in  std_logic
+        );
+    end component;
 begin
     -------------------------------------------------------------------------------
     -- リバースの場合はシンボル内でビットの並びを逆順にする.

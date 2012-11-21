@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha256_test_bench.vhd
 --!     @brief   SHA-256 TEST BENCH :
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -61,9 +61,9 @@ library DUMMY_PLUG;
 use     DUMMY_PLUG.UTIL.INTEGER_TO_STRING;
 use     DUMMY_PLUG.UTIL.HEX_TO_STRING;
 use     DUMMY_PLUG.UTIL.STRING_TO_STD_LOGIC_VECTOR;
-library PipeWork;
-use     PipeWork.SHA256.SHA256_CORE;
-use     PipeWork.SHA256.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA256.SHA256_CORE;
+use     IKWZM_SECURE_HASH.SHA256.HASH_BITS;
 architecture MODEL of SHA256_TEST_BENCH is
     constant  SYMBOL_BITS   : integer := 8;
     constant  REVERSE       : integer := 1;

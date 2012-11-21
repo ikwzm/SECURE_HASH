@@ -1,8 +1,8 @@
 -----------------------------------------------------------------------------------
 --!     @file    sha1_axi4_stream_test_bench.vhd
 --!     @brief   SHA-1 AXI4-Stream Wrapper
---!     @version 0.8.0
---!     @date    2012/11/13
+--!     @version 0.9.0
+--!     @date    2012/11/20
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -70,9 +70,9 @@ use     DUMMY_PLUG.AXI4_TYPES.all;
 use     DUMMY_PLUG.AXI4_MODELS.AXI4_STREAM_MASTER_PLAYER;
 use     DUMMY_PLUG.AXI4_MODELS.AXI4_STREAM_SLAVE_PLAYER;
 use     DUMMY_PLUG.AXI4_MODELS.AXI4_STREAM_SIGNAL_PRINTER;
-library PipeWork;
-use     PipeWork.SHA1.SHA1_CORE;
-use     PipeWork.SHA1.HASH_BITS;
+library IKWZM_SECURE_HASH;
+use     IKWZM_SECURE_HASH.SHA1.SHA1_CORE;
+use     IKWZM_SECURE_HASH.SHA1.HASH_BITS;
 architecture MODEL of SHA1_AXI4_STREAM_TEST_BENCH is
     -------------------------------------------------------------------------------
     -- 各種定数
