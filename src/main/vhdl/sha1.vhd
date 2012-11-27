@@ -2,8 +2,8 @@
 --!     @file    sha1.vhd
 --!     @brief   SHA-1 Package :
 --!              SHA-1用各種定義パッケージ.
---!     @version 0.9.0
---!     @date    2012/11/20
+--!     @version 0.9.1
+--!     @date    2012/11/27
 --!     @author  Ichiro Kawazome <ichiro_k@ca2.so-net.ne.jp>
 -----------------------------------------------------------------------------------
 --
@@ -248,7 +248,7 @@ package body SHA1 is
     -------------------------------------------------------------------------------
     function Ch(B,C,D:WORD_TYPE) return std_logic_vector is
     begin
-        return (B and C) or ((not B) and D);
+        return D xor (B and (C xor D));
     end function;
     -------------------------------------------------------------------------------
     -- 
@@ -262,6 +262,6 @@ package body SHA1 is
     -------------------------------------------------------------------------------
     function Maj(B,C,D:WORD_TYPE) return std_logic_vector is
     begin
-        return (B and C) or (B and D) or (C and D);
+        return (B and C) or ((B or C) and D);
     end function;
 end SHA1;
