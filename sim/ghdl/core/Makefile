@@ -1,5 +1,6 @@
 GHDL=ghdl
 GHDLFLAGS=--mb-comments
+GHDLRUNFLAGS=--mb-comments
 WORK=work
 TOP=../../..
 

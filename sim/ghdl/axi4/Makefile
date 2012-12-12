@@ -1,5 +1,6 @@
 GHDL=ghdl
 GHDLFLAGS=--mb-comments -P$(TOP)/Dummy_Plug/sim/ghdl/dummy_plug --work=IKWZM_SECURE_HASH
+GHDLRUNFLAGS=$(GHDLFLAGS)
 WORK=IKWZM_SECURE_HASH
 TOP=../../..
 
