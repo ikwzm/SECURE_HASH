@@ -1,0 +1,6 @@
+set     script_directory    [file dirname [info script]]
+set     project_directory   [file dirname [info script]]
+source                      [file join $script_directory "parameter.tcl"]
+lappend constrs_file_list   [file join $script_directory "timing.xdc"]
+source                      [file join ".." ".." "scripts" "create_project.tcl"]
+source                      [file join ".." ".." "scripts" "implementation.tcl"]
