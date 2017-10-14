@@ -1,0 +1,331 @@
+Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2017.2 (win64) Build 1909853 Thu Jun 15 18:39:09 MDT 2017
+| Date         : Fri Oct 13 18:52:23 2017
+| Host         : DESKTOP-4KPN332 running 64-bit major release  (build 9200)
+| Command      : report_utilization -file ./sha512_w1_g0_i64_o64.rpt
+| Design       : SHA512_AXI4_STREAM
+| Device       : 7s50fgga484-2
+| Design State : Routed
+------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Slice Logic
+1.1 Summary of Registers by Type
+2. Slice Logic Distribution
+3. Memory
+4. DSP
+5. IO and GT Specific
+6. Clocking
+7. Specific Feature
+8. Primitives
+9. Black Boxes
+10. Instantiated Netlists
+
+1. Slice Logic
+--------------
+
++----------------------------+-------+-------+-----------+-------+
+|          Site Type         |  Used | Fixed | Available | Util% |
++----------------------------+-------+-------+-----------+-------+
+| Slice LUTs                 | 10812 |     0 |     32600 | 33.17 |
+|   LUT as Logic             | 10684 |     0 |     32600 | 32.77 |
+|   LUT as Memory            |   128 |     0 |      9600 |  1.33 |
+|     LUT as Distributed RAM |     0 |     0 |           |       |
+|     LUT as Shift Register  |   128 |     0 |           |       |
+| Slice Registers            |  2662 |     0 |     65200 |  4.08 |
+|   Register as Flip Flop    |  2662 |     0 |     65200 |  4.08 |
+|   Register as Latch        |     0 |     0 |     65200 |  0.00 |
+| F7 Muxes                   |     0 |     0 |     16300 |  0.00 |
+| F8 Muxes                   |     0 |     0 |      8150 |  0.00 |
++----------------------------+-------+-------+-----------+-------+
+
+
+1.1 Summary of Registers by Type
+--------------------------------
+
++-------+--------------+-------------+--------------+
+| Total | Clock Enable | Synchronous | Asynchronous |
++-------+--------------+-------------+--------------+
+| 0     |            _ |           - |            - |
+| 0     |            _ |           - |          Set |
+| 0     |            _ |           - |        Reset |
+| 0     |            _ |         Set |            - |
+| 0     |            _ |       Reset |            - |
+| 0     |          Yes |           - |            - |
+| 557   |          Yes |           - |          Set |
+| 1977  |          Yes |           - |        Reset |
+| 0     |          Yes |         Set |            - |
+| 128   |          Yes |       Reset |            - |
++-------+--------------+-------------+--------------+
+
+
+2. Slice Logic Distribution
+---------------------------
+
++-------------------------------------------+-------+-------+-----------+-------+
+|                 Site Type                 |  Used | Fixed | Available | Util% |
++-------------------------------------------+-------+-------+-----------+-------+
+| Slice                                     |  2946 |     0 |      8150 | 36.15 |
+|   SLICEL                                  |  1992 |     0 |           |       |
+|   SLICEM                                  |   954 |     0 |           |       |
+| LUT as Logic                              | 10684 |     0 |     32600 | 32.77 |
+|   using O5 output only                    |     3 |       |           |       |
+|   using O6 output only                    |  9108 |       |           |       |
+|   using O5 and O6                         |  1573 |       |           |       |
+| LUT as Memory                             |   128 |     0 |      9600 |  1.33 |
+|   LUT as Distributed RAM                  |     0 |     0 |           |       |
+|   LUT as Shift Register                   |   128 |     0 |           |       |
+|     using O5 output only                  |   128 |       |           |       |
+|     using O6 output only                  |     0 |       |           |       |
+|     using O5 and O6                       |     0 |       |           |       |
+| LUT Flip Flop Pairs                       |  2029 |     0 |     32600 |  6.22 |
+|   fully used LUT-FF pairs                 |   450 |       |           |       |
+|   LUT-FF pairs with one unused LUT output |  1565 |       |           |       |
+|   LUT-FF pairs with one unused Flip Flop  |  1530 |       |           |       |
+| Unique Control Sets                       |   140 |       |           |       |
++-------------------------------------------+-------+-------+-----------+-------+
+* Note: Review the Control Sets Report for more information regarding control sets.
+
+
+3. Memory
+---------
+
++-------------------+------+-------+-----------+-------+
+|     Site Type     | Used | Fixed | Available | Util% |
++-------------------+------+-------+-----------+-------+
+| Block RAM Tile    |    1 |     0 |        75 |  1.33 |
+|   RAMB36/FIFO*    |    0 |     0 |        75 |  0.00 |
+|   RAMB18          |    2 |     0 |       150 |  1.33 |
+|     RAMB18E1 only |    2 |       |           |       |
++-------------------+------+-------+-----------+-------+
+* Note: Each Block RAM Tile only has one FIFO logic available and therefore can accommodate only one FIFO36E1 or one FIFO18E1. However, if a FIFO18E1 occupies a Block RAM Tile, that tile can still accommodate a RAMB18E1
+
+
+4. DSP
+------
+
++-----------+------+-------+-----------+-------+
+| Site Type | Used | Fixed | Available | Util% |
++-----------+------+-------+-----------+-------+
+| DSPs      |    0 |     0 |       120 |  0.00 |
++-----------+------+-------+-----------+-------+
+
+
+5. IO and GT Specific
+---------------------
+
++-----------------------------+------+-------+-----------+-------+
+|          Site Type          | Used | Fixed | Available | Util% |
++-----------------------------+------+-------+-----------+-------+
+| Bonded IOB                  |  152 |     0 |       250 | 60.80 |
+|   IOB Master Pads           |   72 |       |           |       |
+|   IOB Slave Pads            |   74 |       |           |       |
+| Bonded IPADs                |    0 |     0 |         2 |  0.00 |
+| PHY_CONTROL                 |    0 |     0 |         5 |  0.00 |
+| PHASER_REF                  |    0 |     0 |         5 |  0.00 |
+| OUT_FIFO                    |    0 |     0 |        20 |  0.00 |
+| IN_FIFO                     |    0 |     0 |        20 |  0.00 |
+| IDELAYCTRL                  |    0 |     0 |         5 |  0.00 |
+| IBUFDS                      |    0 |     0 |       240 |  0.00 |
+| PHASER_OUT/PHASER_OUT_PHY   |    0 |     0 |        20 |  0.00 |
+| PHASER_IN/PHASER_IN_PHY     |    0 |     0 |        20 |  0.00 |
+| IDELAYE2/IDELAYE2_FINEDELAY |    0 |     0 |       250 |  0.00 |
+| ILOGIC                      |    0 |     0 |       250 |  0.00 |
+| OLOGIC                      |    0 |     0 |       250 |  0.00 |
++-----------------------------+------+-------+-----------+-------+
+
+
+6. Clocking
+-----------
+
++------------+------+-------+-----------+-------+
+|  Site Type | Used | Fixed | Available | Util% |
++------------+------+-------+-----------+-------+
+| BUFGCTRL   |    1 |     0 |        32 |  3.13 |
+| BUFIO      |    0 |     0 |        20 |  0.00 |
+| MMCME2_ADV |    0 |     0 |         5 |  0.00 |
+| PLLE2_ADV  |    0 |     0 |         5 |  0.00 |
+| BUFMRCE    |    0 |     0 |        10 |  0.00 |
+| BUFHCE     |    0 |     0 |        72 |  0.00 |
+| BUFR       |    0 |     0 |        20 |  0.00 |
++------------+------+-------+-----------+-------+
+
+
+7. Specific Feature
+-------------------
+
++-------------+------+-------+-----------+-------+
+|  Site Type  | Used | Fixed | Available | Util% |
++-------------+------+-------+-----------+-------+
+| BSCANE2     |    0 |     0 |         4 |  0.00 |
+| CAPTUREE2   |    0 |     0 |         1 |  0.00 |
+| DNA_PORT    |    0 |     0 |         1 |  0.00 |
+| EFUSE_USR   |    0 |     0 |         1 |  0.00 |
+| FRAME_ECCE2 |    0 |     0 |         1 |  0.00 |
+| ICAPE2      |    0 |     0 |         2 |  0.00 |
+| STARTUPE2   |    0 |     0 |         1 |  0.00 |
+| XADC        |    0 |     0 |         1 |  0.00 |
++-------------+------+-------+-----------+-------+
+
+
+8. Primitives
+-------------
+
++----------+------+---------------------+
+| Ref Name | Used | Functional Category |
++----------+------+---------------------+
+| LUT6     | 4882 |                 LUT |
+| LUT5     | 2620 |                 LUT |
+| FDCE     | 1977 |        Flop & Latch |
+| LUT2     | 1890 |                 LUT |
+| LUT3     | 1518 |                 LUT |
+| LUT4     | 1324 |                 LUT |
+| FDPE     |  557 |        Flop & Latch |
+| CARRY4   |  240 |          CarryLogic |
+| SRL16E   |  128 |  Distributed Memory |
+| FDRE     |  128 |        Flop & Latch |
+| IBUF     |   77 |                  IO |
+| OBUF     |   75 |                  IO |
+| LUT1     |   23 |                 LUT |
+| RAMB18E1 |    2 |        Block Memory |
+| BUFG     |    1 |               Clock |
++----------+------+---------------------+
+
+
+9. Black Boxes
+--------------
+
++----------+------+
+| Ref Name | Used |
++----------+------+
+
+
+10. Instantiated Netlists
+-------------------------
+
++----------+------+
+| Ref Name | Used |
++----------+------+
+
+
+Copyright 1986-2017 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2017.2 (win64) Build 1909853 Thu Jun 15 18:39:09 MDT 2017
+| Date         : Fri Oct 13 18:52:37 2017
+| Host         : DESKTOP-4KPN332 running 64-bit major release  (build 9200)
+| Command      : report_timing -file ./sha512_w1_g0_i64_o64.rpt -append
+| Design       : SHA512_AXI4_STREAM
+| Device       : 7s50-fgga484
+| Speed File   : -2  PRODUCTION 1.17 2017-05-11
+------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             0.307ns  (required time - arrival time)
+  Source:                 CORE/PRE_PROC/I_BUF/curr_queue_reg[12][VAL]/C
+                            (rising edge-triggered cell FDCE clocked by ACLK  {rise@0.000ns fall@7.200ns period=14.400ns})
+  Destination:            CORE/PRE_PROC/I_BUF/curr_queue_reg[17][DATA][7]/D
+                            (rising edge-triggered cell FDCE clocked by ACLK  {rise@0.000ns fall@7.200ns period=14.400ns})
+  Path Group:             ACLK
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            14.400ns  (ACLK rise@14.400ns - ACLK rise@0.000ns)
+  Data Path Delay:        14.097ns  (logic 2.899ns (20.565%)  route 11.198ns (79.435%))
+  Logic Levels:           24  (LUT2=1 LUT3=3 LUT4=5 LUT6=15)
+  Clock Path Skew:        -0.035ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    3.730ns = ( 18.130 - 14.400 ) 
+    Source Clock Delay      (SCD):    4.055ns
+    Clock Pessimism Removal (CPR):    0.291ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock ACLK rise edge)       0.000     0.000 r  
+    F21                                               0.000     0.000 r  ACLK (IN)
+                         net (fo=0)                   0.000     0.000    ACLK
+    F21                  IBUF (Prop_ibuf_I_O)         0.924     0.924 r  ACLK_IBUF_inst/O
+                         net (fo=1, routed)           1.693     2.617    ACLK_IBUF
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.081     2.698 r  ACLK_IBUF_BUFG_inst/O
+                         net (fo=2794, routed)        1.358     4.055    CORE/PRE_PROC/I_BUF/ACLK_IBUF_BUFG
+    SLICE_X37Y20         FDCE                                         r  CORE/PRE_PROC/I_BUF/curr_queue_reg[12][VAL]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X37Y20         FDCE (Prop_fdce_C_Q)         0.379     4.434 f  CORE/PRE_PROC/I_BUF/curr_queue_reg[12][VAL]/Q
+                         net (fo=9, routed)           0.988     5.422    CORE/PRE_PROC/I_BUF/curr_queue_reg[12][VAL_n_0_]
+    SLICE_X32Y20         LUT6 (Prop_lut6_I0_O)        0.105     5.527 f  CORE/PRE_PROC/I_BUF/curr_queue[4][VAL]_i_3/O
+                         net (fo=94, routed)          0.468     5.995    CORE/PRE_PROC/I_BUF/p_14_in[18]
+    SLICE_X35Y20         LUT6 (Prop_lut6_I1_O)        0.105     6.100 f  CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_31/O
+                         net (fo=1, routed)           0.321     6.421    CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_31_n_0
+    SLICE_X35Y19         LUT6 (Prop_lut6_I5_O)        0.105     6.526 f  CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_29/O
+                         net (fo=1, routed)           0.477     7.003    CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_29_n_0
+    SLICE_X34Y20         LUT6 (Prop_lut6_I5_O)        0.105     7.108 f  CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_23/O
+                         net (fo=1, routed)           0.345     7.453    CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_23_n_0
+    SLICE_X39Y20         LUT6 (Prop_lut6_I0_O)        0.105     7.558 f  CORE/PRE_PROC/I_BUF/curr_queue[7][VAL]_i_19/O
+                         net (fo=84, routed)          0.600     8.158    CORE/PRE_PROC/I_BUF/p_6_in346_in
+    SLICE_X38Y20         LUT3 (Prop_lut3_I0_O)        0.105     8.263 r  CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_26/O
+                         net (fo=9, routed)           0.340     8.603    CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_26_n_0
+    SLICE_X39Y20         LUT6 (Prop_lut6_I2_O)        0.105     8.708 f  CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_23/O
+                         net (fo=1, routed)           0.360     9.069    CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_23_n_0
+    SLICE_X41Y18         LUT6 (Prop_lut6_I5_O)        0.105     9.174 f  CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_18/O
+                         net (fo=1, routed)           0.113     9.287    CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_18_n_0
+    SLICE_X41Y18         LUT4 (Prop_lut4_I1_O)        0.105     9.392 f  CORE/PRE_PROC/I_BUF/curr_queue[12][VAL]_i_15/O
+                         net (fo=88, routed)          0.582     9.974    CORE/PRE_PROC/I_BUF/p_10_in[13]
+    SLICE_X40Y20         LUT3 (Prop_lut3_I1_O)        0.105    10.079 r  CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_16/O
+                         net (fo=18, routed)          0.285    10.364    CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_16_n_0
+    SLICE_X41Y20         LUT6 (Prop_lut6_I2_O)        0.105    10.469 f  CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_17/O
+                         net (fo=1, routed)           0.113    10.582    CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_17_n_0
+    SLICE_X41Y20         LUT6 (Prop_lut6_I5_O)        0.105    10.687 f  CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_14/O
+                         net (fo=1, routed)           0.343    11.030    CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_14_n_0
+    SLICE_X47Y20         LUT4 (Prop_lut4_I0_O)        0.105    11.135 f  CORE/PRE_PROC/I_BUF/curr_queue[13][VAL]_i_11/O
+                         net (fo=61, routed)          0.625    11.760    CORE/PRE_PROC/I_BUF/p_8_in[12]
+    SLICE_X47Y19         LUT3 (Prop_lut3_I0_O)        0.105    11.865 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_38/O
+                         net (fo=9, routed)           0.470    12.334    CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_38_n_0
+    SLICE_X47Y18         LUT6 (Prop_lut6_I2_O)        0.105    12.439 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_27/O
+                         net (fo=1, routed)           0.513    12.952    CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_27_n_0
+    SLICE_X49Y17         LUT4 (Prop_lut4_I0_O)        0.105    13.057 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_18/O
+                         net (fo=76, routed)          0.907    13.964    CORE/PRE_PROC/I_BUF/p_0_in107_in
+    SLICE_X49Y14         LUT6 (Prop_lut6_I1_O)        0.105    14.069 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_35/O
+                         net (fo=1, routed)           0.347    14.417    CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_35_n_0
+    SLICE_X49Y13         LUT6 (Prop_lut6_I5_O)        0.105    14.522 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_23/O
+                         net (fo=1, routed)           0.312    14.834    CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_23_n_0
+    SLICE_X47Y13         LUT4 (Prop_lut4_I0_O)        0.105    14.939 r  CORE/PRE_PROC/I_BUF/curr_queue[15][VAL]_i_16/O
+                         net (fo=37, routed)          0.455    15.394    CORE/PRE_PROC/I_BUF/p_0_in355_in
+    SLICE_X43Y14         LUT6 (Prop_lut6_I2_O)        0.105    15.499 r  CORE/PRE_PROC/I_BUF/curr_queue[19][VAL]_i_5/O
+                         net (fo=1, routed)           0.317    15.816    CORE/PRE_PROC/I_BUF/curr_queue[19][VAL]_i_5_n_0
+    SLICE_X43Y14         LUT4 (Prop_lut4_I0_O)        0.105    15.921 r  CORE/PRE_PROC/I_BUF/curr_queue[19][VAL]_i_4/O
+                         net (fo=28, routed)          0.620    16.541    CORE/PRE_PROC/I_BUF/p_0_in318_in
+    SLICE_X44Y17         LUT6 (Prop_lut6_I5_O)        0.105    16.646 r  CORE/PRE_PROC/I_BUF/curr_queue[17][VAL]_i_2/O
+                         net (fo=19, routed)          0.758    17.404    CORE/PRE_PROC/I_BUF/p_0_in[6]
+    SLICE_X48Y15         LUT2 (Prop_lut2_I0_O)        0.105    17.509 r  CORE/PRE_PROC/I_BUF/curr_queue[17][DATA][7]_i_5__0/O
+                         net (fo=1, routed)           0.538    18.047    CORE/PRE_PROC/I_BUF/curr_queue[17][DATA][7]_i_5__0_n_0
+    SLICE_X46Y15         LUT6 (Prop_lut6_I4_O)        0.105    18.152 r  CORE/PRE_PROC/I_BUF/curr_queue[17][DATA][7]_i_2__0/O
+                         net (fo=1, routed)           0.000    18.152    CORE/PRE_PROC/I_BUF/curr_queue[17][DATA][7]_i_2__0_n_0
+    SLICE_X46Y15         FDCE                                         r  CORE/PRE_PROC/I_BUF/curr_queue_reg[17][DATA][7]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock ACLK rise edge)      14.400    14.400 r  
+    F21                                               0.000    14.400 r  ACLK (IN)
+                         net (fo=0)                   0.000    14.400    ACLK
+    F21                  IBUF (Prop_ibuf_I_O)         0.793    15.193 r  ACLK_IBUF_inst/O
+                         net (fo=1, routed)           1.604    16.797    ACLK_IBUF
+    BUFGCTRL_X0Y16       BUFG (Prop_bufg_I_O)         0.077    16.874 r  ACLK_IBUF_BUFG_inst/O
+                         net (fo=2794, routed)        1.256    18.130    CORE/PRE_PROC/I_BUF/ACLK_IBUF_BUFG
+    SLICE_X46Y15         FDCE                                         r  CORE/PRE_PROC/I_BUF/curr_queue_reg[17][DATA][7]/C
+                         clock pessimism              0.291    18.420    
+                         clock uncertainty           -0.035    18.385    
+    SLICE_X46Y15         FDCE (Setup_fdce_C_D)        0.074    18.459    CORE/PRE_PROC/I_BUF/curr_queue_reg[17][DATA][7]
+  -------------------------------------------------------------------
+                         required time                         18.459    
+                         arrival time                         -18.152    
+  -------------------------------------------------------------------
+                         slack                                  0.307    
+
+
+
+

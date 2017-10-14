@@ -12,11 +12,13 @@ SHA-1,SHA-256,SHA-512を計算する論理合成可能なVHDLモジュールで�
 以下の開発環境で合成出来ることを確認しています.
 
 * Xilinx ISE14.2
+* Xilinx Vivado 2017.2
 * Altera QuartusII 11.1sp2 Web Edition(32bit)
 
 ### 論理合成
 
-fpga/xilinx/ise14.2 の下に Xilinx 社FPGA用の各プロジェクトがあります.    
+fpga/xilinx/ise14.2 の下に Xilinx 社FPGA(Spartan6,Virtex6)用の各プロジェクトがあります.    
+fpga/xilinx/vivado2017.2 の下に Xilinx 社FPGA(Spartan7,Artix7)用の各プロジェクトがあります.    
 fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成するスクリプトがあります.
 
 
@@ -69,6 +71,38 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
     <td align="right">1135[Mbit/sec]</td>
   </tr>
   <tr>
+    <th align="right" rowspan="4">Spartan7</th>
+    <th align="right" rowspan="4">-3</th>
+    <td align="right" rowspan="2">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">1134,2527</td>
+    <td align="right">170[MHz]</td>
+    <td align="right">1085[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">1131,2567</td>
+    <td align="right">208[MHz]</td>
+    <td align="right">1317[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">1469,2421</td>
+    <td align="right">122[MHz]</td>
+    <td align="right">1561[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">1470,2434</td>
+    <td align="right">150[MHz]</td>
+    <td align="right">1875[Mbit/sec]</td>
+  </tr>
+  <tr>
     <th align="right" rowspan="4">Virtex6</th>
     <th align="right" rowspan="4">-3</th>
     <td align="right" rowspan="2">1</td>
@@ -99,6 +133,38 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
     <td align="right">1517,1897</td>
     <td align="right">136[MHz]</td>
     <td align="right">1711[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="4">Artix7</th>
+    <th align="right" rowspan="4">-2</th>
+    <td align="right" rowspan="2">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">1134,2527</td>
+    <td align="right">169[MHz]</td>
+    <td align="right">1085[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">1131,2566</td>
+    <td align="right">200[MHz]</td>
+    <td align="right">1264[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">1469,2421</td>
+    <td align="right">122[MHz]</td>
+    <td align="right">1561[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">1470,2435</td>
+    <td align="right">147[MHz]</td>
+    <td align="right">1836[Mbit/sec]</td>
   </tr>
   <tr>
     <th align="right" rowspan="4">CycloneIV</th>
@@ -215,6 +281,84 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
     <td align="right">1835,3094</td>
     <td align="right">69[MHz]</td>
     <td align="right">1070[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="5">Spartan7</th>
+    <th align="right" rowspan="5">-2</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">64</td>
+    <td align="right">1361,3408</td>
+    <td align="right">143[MHz]</td>
+    <td align="right">1143[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">65</td>
+    <td align="right">1371,3407</td>
+    <td align="right">169[MHz]</td>
+    <td align="right">1335[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">68</td>
+    <td align="right">1498,3739</td>
+    <td align="right">217[MHz]</td>
+    <td align="right">1637[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">32</td>
+    <td align="right">1699,3542</td>
+    <td align="right">85[MHz]</td>
+    <td align="right">1368[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">33</td>
+    <td align="right">1701,3585</td>
+    <td align="right">100[MHz]</td>
+    <td align="right">1552[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="5">Artix7</th>
+    <th align="right" rowspan="5">-2</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">64</td>
+    <td align="right">1361,3408</td>
+    <td align="right">143[MHz]</td>
+    <td align="right">1143[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">65</td>
+    <td align="right">1371,3405</td>
+    <td align="right">167[MHz]</td>
+    <td align="right">1313[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">68</td>
+    <td align="right">1498,3736</td>
+    <td align="right">208[MHz]</td>
+    <td align="right">1569[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">32</td>
+    <td align="right">1699,3542</td>
+    <td align="right">85[MHz]</td>
+    <td align="right">1356[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">33</td>
+    <td align="right">1701,3590</td>
+    <td align="right">100[MHz]</td>
+    <td align="right">1552[Mbit/sec]</td>
   </tr>
   <tr>
     <th align="right" rowspan="5">Virtex6</th>
@@ -386,6 +530,84 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
     <td align="right">1469[Mbit/sec]</td>
   </tr>
   <tr>
+    <th align="right" rowspan="5">Spartan7</th>
+    <th align="right" rowspan="5">-2</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">2662,10812</td>
+    <td align="right">69[MHz]</td>
+    <td align="right">889[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">2663,10800</td>
+    <td align="right">68[MHz]</td>
+    <td align="right">854[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">84</td>
+    <td align="right">2871,10849</td>
+    <td align="right">67[MHz]</td>
+    <td align="right">813[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">3377,13832</td>
+    <td align="right">68[MHz]</td>
+    <td align="right">1730[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">3372,13837</td>
+    <td align="right">68[MHz]</td>
+    <td align="right">1688[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <th align="right" rowspan="5">Artix7</th>
+    <th align="right" rowspan="5">-2</th>
+    <td align="right" rowspan="3">1</td>
+    <td align="right">0</td>
+    <td align="right">80</td>
+    <td align="right">2662,10819</td>
+    <td align="right">70[MHz]</td>
+    <td align="right">895[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">81</td>
+    <td align="right">2663,10801</td>
+    <td align="right">67[MHz]</td>
+    <td align="right">843[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">4</td>
+    <td align="right">84</td>
+    <td align="right">2871,10853</td>
+    <td align="right">69[MHz]</td>
+    <td align="right">841[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right" rowspan="2">2</td>
+    <td align="right">0</td>
+    <td align="right">40</td>
+    <td align="right">3377,13824</td>
+    <td align="right">67[MHz]</td>
+    <td align="right">1707[Mbit/sec]</td>
+  </tr>
+  <tr>
+    <td align="right">1</td>
+    <td align="right">41</td>
+    <td align="right">3372,13822</td>
+    <td align="right">69[MHz]</td>
+    <td align="right">1734[Mbit/sec]</td>
+  </tr>
+  <tr>
     <th align="right" rowspan="5">Virtex6</th>
     <th align="right" rowspan="5">-3</th>
     <td align="right" rowspan="3">1</td>
@@ -508,11 +730,13 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
 ### シミュレーション
 
 #### 他に必要なファイル
+
 シミュレーションをするためには次のファイルが必要です。
 
 * 文字列操作用の各種ユーティリティ         util.vhd       (<https://github.com/ikwzm/Dummy_Plug.git>)
 
 #### GHDLによるシミュレーション
+
 シミュレーションには GHDL (http://ghdl.free.fr/) を使いました.
 
 ディレクトリ sim/ghdl に移動して make コマンドでシミュレーションが走ります.
@@ -520,6 +744,7 @@ fpga/altera/11.2sp2 の下に Altera 社FPGA用の各プロジェクトを生成
 もしかしたら他のシミュレーションでは走らないかもしれません。その際はご一報ください.
 
 #### Isimによるシミュレーション
+
 Xilinx社のIsimでシミュレーションすることができます.
 
 ISE Design Suite 14.2 で動作を確認しています.
@@ -527,8 +752,10 @@ ISE Design Suite 14.2 で動作を確認しています.
 ディレクトリ sim/isim にXilinx社のプロジェクトファイルがあります.
 
 ### 注意
+
 とりあえず簡単なテストはしていますが、完璧ではありません.
 
 ### ライセンス
+
 二条項BSDライセンス (2-clause BSD license) で公開しています。
 
